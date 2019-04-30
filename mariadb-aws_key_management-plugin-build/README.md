@@ -1,0 +1,89 @@
+[![dockeri.co](https://dockeri.co/image/creemama/mariadb-aws_key_management-plugin-build)](https://hub.docker.com/r/creemama/mariadb-aws_key_management-plugin-build)
+
+# Supported tags and respective `Dockerfile` links
+
+- [`10.4.4-bionic`, `10.4-bionic`, `rc-bionic`, `10.4.4`, `10.4`, `rc`
+  _(10.4/Dockerfile)_](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/10.4/Dockerfile)
+- [`10.3.14-bionic`, `10.3-bionic`, `10-bionic`, `bionic`, `10.3.14`, `10.3`,
+  `10`, `latest`
+  _(10.3/Dockerfile)_](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/10.3/Dockerfile)
+- [`10.2.23-bionic`, `10.2-bionic`, `10.2.23`, `10.2`
+  _(10.2/Dockerfile)_](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/10.2/Dockerfile)
+
+# The AWS Key Management Plugin for MariaDB
+
+These Docker images build the AWS Key Management Plugin from source. The
+resulting `aws_key_management.so` is compatible with the [Docker official
+images for MariaDB](https://hub.docker.com/_/mariadb).
+
+To make `aws_key_management.so` do the following:
+
+```
+docker run --name aws_key_management_build creemama/mariadb-aws_key_management-plugin-build:latest
+docker cp aws_key_management_build:/usr/local/src/build-mariadb/plugin/aws_key_management/aws_key_management.so .
+```
+
+The AWS Key Management Plugin is no longer available from the APT repo.
+According to a [MariaDB bug
+report](https://jira.mariadb.org/browse/MDEV-18752?focusedCommentId=123862&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-123862),
+the "plugin uses (and is linked with) AWS C++ SDK, which is available under the
+Apache 2.0 license. And this license it not compatible with GPLv2."
+
+When building MariaDB with the AWS Key Management Plugin, the build output
+warns that "You have linked MariaDB with GPLv3 libraries! You may not
+distribute the resulting binary. If you do, you will put yourself into a
+legal problem with the Free Software Foundation." Note that Apache 2.0 is
+[GPLv3
+compatible](https://en.wikipedia.org/wiki/Apache_License#GPL_compatibility).
+
+To use the `aws_key_management.so` library created by this image in a MariaDB
+image (not for distribution), you could do the folllowing:
+
+```
+FROM creemama/mariadb-aws_key_management-plugin-build:10.3.14-bionic
+RUN make aws_key_management
+
+FROM mariadb:10.3.14-bionic
+COPY \
+  --from=0 \
+  /usr/local/src/build-mariadb/plugin/aws_key_management/aws_key_management.so \
+  /usr/lib/mysql/plugin/aws_key_management.so
+COPY \
+  --from=0 \
+  /usr/local/src/server/debian/additions/enable_encryption.preset \
+  /etc/mysql/conf.d/enable_encryption.preset
+RUN usermod -d /var/lib/mysql/ mysql \
+ && apt-get -y update \
+ && apt-get -y install --no-install-recommends \
+      libcurl4 \
+      openssl \
+      uuid \
+ && printf "%s\n" "[mariadb]"                                             >> /etc/mysql/conf.d/encryption.cnf \
+ && printf "%s\n" "!include /etc/mysql/conf.d/enable_encryption.preset"   >> /etc/mysql/conf.d/encryption.cnf \
+ && printf "%s\n" "ssl_cert = /etc/my.cnf.d/certificates/server-cert.pem" >> /etc/mysql/conf.d/encryption.cnf \
+ && printf "%s\n" "ssl_key = /etc/my.cnf.d/certificates/server-key.pem"   >> /etc/mysql/conf.d/encryption.cnf \
+ && printf "%s\n" "ssl_ca = /etc/my.cnf.d/certificates/ca.pem"            >> /etc/mysql/conf.d/encryption.cnf
+
+USER mysql
+
+CMD mysqld \
+  --plugin-load-add aws_key_management \
+  --aws_key_management_key_spec=AES_256 \
+  --aws_key_management_log_level=Warn \
+  --aws_key_management_master_key_id=alias/mariadb-encryption \
+  --aws_key_management_region=us-east-1 \
+  --aws_key_management_rotate_key=-1
+```
+
+For how to build and set up the AWS Key Management Plugin from source, the
+following articles are helpful:
+
+- ["AWS Key Management Encryption
+  Plugin"](https://mariadb.com/kb/en/library/aws-key-management-encryption-plugin/)
+- ["Build Environment Setup for
+  Linux"](https://mariadb.com/kb/en/library/Build_Environment_Setup_for_Linux/)
+- ["Amazon Web Services (AWS) Key Management Service (KMS) Encryption Plugin
+  Setup
+  Guide"](https://mariadb.com/kb/en/library/aws-key-management-encryption-plugin-setup-guide/)
+- ["Encrypting MariaDB on Ubuntu
+  16.04"](https://medium.com/@acurrieclark/encrypting-mariadb-e3b434170910)
