@@ -60,9 +60,11 @@ RUN usermod -d /var/lib/mysql/ mysql \
       uuid \
  && printf "%s\n" "[mariadb]"                                             >> /etc/mysql/conf.d/encryption.cnf \
  && printf "%s\n" "!include /etc/mysql/conf.d/enable_encryption.preset"   >> /etc/mysql/conf.d/encryption.cnf \
+ && printf "%s\n" "innodb_encrypt_tables = FORCE"                         >> /etc/mysql/conf.d/encryption.cnf \
+ && printf "%s\n" "innodb_encryption_threads = 4"                         >> /etc/mysql/conf.d/encryption.cnf \
+ && printf "%s\n" "ssl_ca = /etc/my.cnf.d/certificates/ca.pem"            >> /etc/mysql/conf.d/encryption.cnf \
  && printf "%s\n" "ssl_cert = /etc/my.cnf.d/certificates/server-cert.pem" >> /etc/mysql/conf.d/encryption.cnf \
- && printf "%s\n" "ssl_key = /etc/my.cnf.d/certificates/server-key.pem"   >> /etc/mysql/conf.d/encryption.cnf \
- && printf "%s\n" "ssl_ca = /etc/my.cnf.d/certificates/ca.pem"            >> /etc/mysql/conf.d/encryption.cnf
+ && printf "%s\n" "ssl_key = /etc/my.cnf.d/certificates/server-key.pem"   >> /etc/mysql/conf.d/encryption.cnf
 
 USER mysql
 
