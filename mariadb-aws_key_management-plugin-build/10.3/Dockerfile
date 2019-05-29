@@ -12,7 +12,7 @@ RUN printf "%s\n" "deb-src http://security.ubuntu.com/ubuntu/ bionic-security un
       uuid-dev \
  && cd /usr/local/src \
  && git clone \
-      --branch mariadb-10.3.14 \
+      --branch mariadb-10.3.15 \
       --depth 1 \
       https://github.com/MariaDB/server.git \
  && mkdir build-mariadb \

@@ -2,12 +2,12 @@
 
 # Supported tags and respective `Dockerfile` links
 
-- [`10.4.4-bionic`, `10.4-bionic`, `rc-bionic`, `10.4.4`, `10.4`, `rc`
+- [`10.4.5-bionic`, `10.4-bionic`, `rc-bionic`, `10.4.5`, `10.4`, `rc`
   _(10.4/Dockerfile)_](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/10.4/Dockerfile)
-- [`10.3.14-bionic`, `10.3-bionic`, `10-bionic`, `bionic`, `10.3.14`, `10.3`,
+- [`10.3.15-bionic`, `10.3-bionic`, `10-bionic`, `bionic`, `10.3.15`, `10.3`,
   `10`, `latest`
   _(10.3/Dockerfile)_](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/10.3/Dockerfile)
-- [`10.2.23-bionic`, `10.2-bionic`, `10.2.23`, `10.2`
+- [`10.2.24-bionic`, `10.2-bionic`, `10.2.24`, `10.2`
   _(10.2/Dockerfile)_](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/10.2/Dockerfile)
 
 # The AWS Key Management Plugin for MariaDB
