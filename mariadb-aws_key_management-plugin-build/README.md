@@ -16,7 +16,7 @@ These Docker images build the AWS Key Management Plugin from source. The
 resulting `aws_key_management.so` is compatible with the [Docker official
 images for MariaDB](https://hub.docker.com/_/mariadb).
 
-To make `aws_key_management.so` do the following:
+To make `aws_key_management.so`, do the following:
 
 ```
 docker run --name aws_key_management_build creemama/mariadb-aws_key_management-plugin-build:latest
