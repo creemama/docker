@@ -40,10 +40,10 @@ To use the `aws_key_management.so` library created by this image in a MariaDB
 image (not for distribution), you could do the folllowing:
 
 ```
-FROM creemama/mariadb-aws_key_management-plugin-build:10.3.14-bionic
+FROM creemama/mariadb-aws_key_management-plugin-build:10.3.15-bionic
 RUN make aws_key_management
 
-FROM mariadb:10.3.14-bionic
+FROM mariadb:10.3.15-bionic
 COPY \
   --from=0 \
   /usr/local/src/build-mariadb/plugin/aws_key_management/aws_key_management.so \
