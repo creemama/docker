@@ -25,4 +25,7 @@ RUN printf "%s\n" "deb-src http://security.ubuntu.com/ubuntu/ bionic-security un
 
 WORKDIR /usr/local/src/build-mariadb
 
-CMD sh -c "make aws_key_management && printf '\n\n%s\n%s\n\n%s\n\n' 'To get the built aws_key_management.so library, execute the following ' 'replacing container-name as appropriate:' 'docker cp container-name:/usr/local/src/build-mariadb/plugin/aws_key_management/aws_key_management.so .'"
+CMD sh -c "make aws_key_management && printf '\n\n%s\n%s\n\n%s\n\n' \
+      'To get the built aws_key_management.so library, execute the following ' \
+      'replacing container-name as appropriate:' \
+      'docker cp container-name:/usr/local/src/build-mariadb/plugin/aws_key_management/aws_key_management.so .'"
