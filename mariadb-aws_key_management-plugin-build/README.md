@@ -2,12 +2,11 @@
 
 # Supported tags and respective `Dockerfile` links
 
-- [`10.4.5-bionic`, `10.4-bionic`, `rc-bionic`, `10.4.5`, `10.4`, `rc`
+- [`10.4.6-bionic`, `10.4-bionic`, `10-bionic`, `bionic`, `10.4.6`, `10.4`, `10`, `latest`
   _(10.4/Dockerfile)_](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/10.4/Dockerfile)
-- [`10.3.15-bionic`, `10.3-bionic`, `10-bionic`, `bionic`, `10.3.15`, `10.3`,
-  `10`, `latest`
+- [`10.3.16-bionic`, `10.3-bionic`, `10.3.16`, `10.3`
   _(10.3/Dockerfile)_](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/10.3/Dockerfile)
-- [`10.2.24-bionic`, `10.2-bionic`, `10.2.24`, `10.2`
+- [`10.2.25-bionic`, `10.2-bionic`, `10.2.25`, `10.2`
   _(10.2/Dockerfile)_](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/10.2/Dockerfile)
 
 # The AWS Key Management Plugin for MariaDB
@@ -40,10 +39,10 @@ To use the `aws_key_management.so` library created by this image in a MariaDB
 image (not for distribution), you could do the folllowing:
 
 ```
-FROM creemama/mariadb-aws_key_management-plugin-build:10.3.15-bionic
+FROM creemama/mariadb-aws_key_management-plugin-build:10.4.6-bionic
 RUN make aws_key_management
 
-FROM mariadb:10.3.15-bionic
+FROM mariadb:10.4.6-bionic
 COPY \
   --from=0 \
   /usr/local/src/build-mariadb/plugin/aws_key_management/aws_key_management.so \
