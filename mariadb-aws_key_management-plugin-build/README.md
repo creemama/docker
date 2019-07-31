@@ -53,12 +53,13 @@ COPY \
   /etc/mysql/conf.d/enable_encryption.preset
 RUN usermod -d /var/lib/mysql/ mysql \
  && apt-get -y update \
- && apt-get -y install --no-install-recommends \
+ && apt-get -y install \
       libcurl4 \
       openssl \
       uuid \
  && printf "%s\n" "[mariadb]"                                             >> /etc/mysql/conf.d/encryption.cnf \
  && printf "%s\n" "!include /etc/mysql/conf.d/enable_encryption.preset"   >> /etc/mysql/conf.d/encryption.cnf \
+ && printf "%s\n" "innodb_encrypt_log = ON"                               >> /etc/mysql/conf.d/encryption.cnf \
  && printf "%s\n" "innodb_encrypt_tables = FORCE"                         >> /etc/mysql/conf.d/encryption.cnf \
  && printf "%s\n" "innodb_encryption_threads = 4"                         >> /etc/mysql/conf.d/encryption.cnf \
  && printf "%s\n" "ssl_ca = /etc/my.cnf.d/certificates/ca.pem"            >> /etc/mysql/conf.d/encryption.cnf \
@@ -68,6 +69,8 @@ RUN usermod -d /var/lib/mysql/ mysql \
 USER mysql
 
 CMD mysqld \
+  --encrypt-binlog=1 \
+  --encrypt-tmp-files=1 \
   --plugin-load-add aws_key_management \
   --aws_key_management_key_spec=AES_256 \
   --aws_key_management_log_level=Warn \
