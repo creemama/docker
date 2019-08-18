@@ -2,11 +2,11 @@
 
 # Supported tags and respective `Dockerfile` links
 
-- [`10.4.6-bionic`, `10.4-bionic`, `10-bionic`, `bionic`, `10.4.6`, `10.4`, `10`, `latest`
+- [`10.4.7-bionic`, `10.4-bionic`, `10-bionic`, `bionic`, `10.4.7`, `10.4`, `10`, `latest`
   _(10.4/Dockerfile)_](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/10.4/Dockerfile)
-- [`10.3.16-bionic`, `10.3-bionic`, `10.3.16`, `10.3`
+- [`10.3.17-bionic`, `10.3-bionic`, `10.3.17`, `10.3`
   _(10.3/Dockerfile)_](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/10.3/Dockerfile)
-- [`10.2.25-bionic`, `10.2-bionic`, `10.2.25`, `10.2`
+- [`10.2.26-bionic`, `10.2-bionic`, `10.2.26`, `10.2`
   _(10.2/Dockerfile)_](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/10.2/Dockerfile)
 
 # The AWS Key Management Plugin for MariaDB
@@ -39,10 +39,10 @@ To use the `aws_key_management.so` library created by this image in a MariaDB
 image (not for distribution), you could do the folllowing:
 
 ```
-FROM creemama/mariadb-aws_key_management-plugin-build:10.4.6-bionic
+FROM creemama/mariadb-aws_key_management-plugin-build:10.4.7-bionic
 RUN make aws_key_management
 
-FROM mariadb:10.4.6-bionic
+FROM mariadb:10.4.7-bionic
 COPY \
   --from=0 \
   /usr/local/src/build-mariadb/plugin/aws_key_management/aws_key_management.so \
@@ -62,9 +62,9 @@ RUN usermod -d /var/lib/mysql/ mysql \
  && printf "%s\n" "innodb_encrypt_log = ON"                               >> /etc/mysql/conf.d/encryption.cnf \
  && printf "%s\n" "innodb_encrypt_tables = FORCE"                         >> /etc/mysql/conf.d/encryption.cnf \
  && printf "%s\n" "innodb_encryption_threads = 4"                         >> /etc/mysql/conf.d/encryption.cnf \
- && printf "%s\n" "ssl_ca = /etc/my.cnf.d/certificates/ca.pem"            >> /etc/mysql/conf.d/encryption.cnf \
- && printf "%s\n" "ssl_cert = /etc/my.cnf.d/certificates/server-cert.pem" >> /etc/mysql/conf.d/encryption.cnf \
- && printf "%s\n" "ssl_key = /etc/my.cnf.d/certificates/server-key.pem"   >> /etc/mysql/conf.d/encryption.cnf
+ && printf "%s\n" "ssl_ca = /run/secrets/mariadb-ca"                      >> /etc/mysql/conf.d/encryption.cnf \
+ && printf "%s\n" "ssl_cert = /run/secrets/mariadb-server-cert"           >> /etc/mysql/conf.d/encryption.cnf \
+ && printf "%s\n" "ssl_key = /run/secrets/mariadb-server-key"             >> /etc/mysql/conf.d/encryption.cnf
 
 USER mysql
 

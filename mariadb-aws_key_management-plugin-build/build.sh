@@ -4,9 +4,9 @@ if [ -n "${BASH_VERSION:-}" ]; then
   set -o pipefail
 fi
 
-version_10_2_patch=25
-version_10_3_patch=16
-version_10_4_patch=6
+version_10_2_patch=26
+version_10_3_patch=17
+version_10_4_patch=7
 version_10_2="10.2.${version_10_2_patch}-bionic"
 version_10_3="10.3.${version_10_3_patch}-bionic"
 version_10_4="10.4.${version_10_4_patch}-bionic"
