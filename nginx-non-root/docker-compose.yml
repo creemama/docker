@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+  nginx-non-root:
+    build:
+      context: ./docker
+    cap_drop:
+      - ALL
+    container_name: 'nginx-non-root'
+    environment:
+      - TZ=EST5EDT
+    image: creemama/nginx-non-root:1.17.10-alpine
+    ports:
+      # HOST:CONTAINER
+      - 8080:8080
+    read_only: true
+    restart: on-failure:5
+    security_opt:
+      - no-new-privileges
+    ulimits:
+      nproc: 500
+    user: nginx
+    volumes:
+      - /tmp

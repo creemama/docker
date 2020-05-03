@@ -1,0 +1,41 @@
+version: '3.7'
+services:
+  nginx-ssl-example:
+    cap_drop:
+      - ALL
+    command: start-server.sh
+    container_name: 'nginx-ssl-example'
+    environment:
+      - TZ=EST5EDT
+    healthcheck:
+      interval: 5m
+      retries: 3
+      start_period: 1m
+      test: ["CMD", "wget", "--no-check-certificate", "-q", "--spider", "https://localhost:8443"]
+      timeout: 30s
+    image: creemama/nginx-non-root:1.17.10-alpine
+    ports:
+      # HOST:CONTAINER
+      - 8080:8080
+      - 8443:8443
+    read_only: true
+    restart: on-failure:5
+    secrets:
+      - source: fullchain
+      - source: privkey
+    security_opt:
+      - no-new-privileges
+    ulimits:
+      nproc: 500
+    user: nginx
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./dod-roots.crt:/etc/nginx/dod-roots.crt:ro
+      - /tmp
+      - ./lazy-load-ocsp.sh:/usr/local/bin/lazy-load-ocsp.sh:ro
+      - ./start-server.sh:/usr/local/bin/start-server.sh:ro
+secrets:
+  fullchain:
+    file: "./self-signed.crt"
+  privkey:
+    file: "./self-signed.key"
