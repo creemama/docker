@@ -94,5 +94,5 @@ Uncomment the Common Access Card (CAC) section if you would like to use CAC auth
 We created [self-signed.crt](https://github.com/creemama/docker/blob/master/nginx-non-root/ssl-example/self-signed.crt) and [self-signed.key](https://github.com/creemama/docker/blob/master/nginx-non-root/ssl-example/self-signed.key) using the following command:
 
 ```
-./self-signed-cert-generate.sh "localhost" "DNS:localshot"
+./self-signed-cert-generate.sh "localhost" "DNS:localhost"
 ```
