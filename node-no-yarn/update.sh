@@ -15,6 +15,9 @@ build_node_no_yarn() {
 	docker build --no-cache --tag "creemama/node-no-yarn:${docker_tag}" .
 	docker tag "creemama/node-no-yarn:${docker_tag}" creemama/node-no-yarn:lts-alpine
 	cd ../..
+	printf '\nTest Docker image: '
+	docker run --rm creemama/node-no-yarn:lts-alpine -e "console.log(process.version)"
+	printf '\n'
 }
 
 commit_to_git() {
@@ -27,6 +30,8 @@ commit_to_git() {
 	git add -A
 	git commit -m "Bump the version of node-no-yarn to ${latest_node_lts_alpine_version}"
 	git tag "node-no-yarn-${docker_tag}"
+	git push origin master
+	git push origin "node-no-yarn-${docker_tag}"
 }
 
 download_latest_dockerfile() {
@@ -94,13 +99,14 @@ main() {
 	./format.sh || true
 	commit_to_git "${docker_tag}" "${latest_node_lts_alpine_version}"
 	upload_docker_images "${docker_tag}"
+	printf '\nUpdate DockerHub README.\n\n'
 }
 
 remove_old_directories() {
 	for dir in */; do
 		local dir_without_forward_slash
 		dir_without_forward_slash="$(printf '%s' "${dir}" | cut -c1-$((${#dir} - 1)))"
-		if is_integer "${dir_without_forward_slash}" && [ $((dir_without_forward_slash % 2)) -eq 0 ]; then
+		if is_integer "${dir_without_forward_slash}"; then
 			rm -rf "${dir_without_forward_slash}"
 		fi
 	done
