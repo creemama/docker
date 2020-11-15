@@ -2,7 +2,7 @@
 
 # Supported tags and respective `Dockerfile` links
 
-- [`14.15.0-alpine3.11`,`lts-alpine`](https://github.com/creemama/docker/blob/node-no-yarn-14.15.0-alpine3.11/node-no-yarn/14/alpine3.11/Dockerfile)
+- [`{{tag}}`,`lts-alpine`](https://github.com/creemama/docker/blob/node-no-yarn-{{tag}}/node-no-yarn/{{dir}}/Dockerfile)
 
 # A Node.js Docker image without Yarn
 
@@ -16,10 +16,10 @@ Simply put, the images here do not contain pre-installed versions of Yarn.
 The `Dockerfile`s used to build the images are the exact same as the offical
 `Dockerfile`s except, as you guessed, we deleted the Yarn part.
 
-| Image                                    |  Size |
-| ---------------------------------------- | ----: |
-| creemama/node-no-yarn:14.15.0-alpine3.11 | 109MB |
-| node:14.15.0-alpine3.11                  | 117MB |
+| Image                         |                  Size |
+| ----------------------------- | --------------------: |
+| creemama/node-no-yarn:{{tag}} | {{node-no-yarn-size}} |
+| node:{{tag}}                  |         {{node-size}} |
 
 # Example
 
