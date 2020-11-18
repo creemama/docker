@@ -68,6 +68,35 @@ is_integer() {
 }
 
 main() {
+	update
+}
+
+remove_old_directories() {
+	for dir in */; do
+		# shellcheck disable=SC2039
+		local dir_without_forward_slash
+		dir_without_forward_slash="$(printf '%s' "${dir}" | cut -c1-$((${#dir} - 1)))"
+		if is_integer "${dir_without_forward_slash}"; then
+			rm -rf "${dir_without_forward_slash}"
+		fi
+	done
+}
+
+remove_yarn_from_dockerfile() {
+	# shellcheck disable=SC2039
+	local alpine_dir
+	alpine_dir="${1}"
+	# Remove the extra new line at the end of the file with sed '$ d'. See
+	# https://stackoverflow.com/a/4881990.
+	cp "${alpine_dir}/Dockerfile" "${alpine_dir}/Dockerfile.bak"
+	tr '\n' '\r' <"${alpine_dir}/Dockerfile.bak" |
+		sed -E 's/ENV YARN_VERSION.*  && yarn --version..//g' |
+		tr '\r' '\n' |
+		sed '$ d' >"${alpine_dir}/Dockerfile"
+	rm "${alpine_dir}/Dockerfile.bak"
+}
+
+update() {
 	# shellcheck disable=SC2039
 	local script_dir
 	script_dir="$(
@@ -115,31 +144,6 @@ main() {
 	commit_to_git "${docker_tag}" "${latest_node_lts_alpine_version}"
 	upload_docker_images "${docker_tag}"
 	printf '\nUpdate DockerHub README.\n\n'
-}
-
-remove_old_directories() {
-	for dir in */; do
-		# shellcheck disable=SC2039
-		local dir_without_forward_slash
-		dir_without_forward_slash="$(printf '%s' "${dir}" | cut -c1-$((${#dir} - 1)))"
-		if is_integer "${dir_without_forward_slash}"; then
-			rm -rf "${dir_without_forward_slash}"
-		fi
-	done
-}
-
-remove_yarn_from_dockerfile() {
-	# shellcheck disable=SC2039
-	local alpine_dir
-	alpine_dir="${1}"
-	# Remove the extra new line at the end of the file with sed '$ d'. See
-	# https://stackoverflow.com/a/4881990.
-	cp "${alpine_dir}/Dockerfile" "${alpine_dir}/Dockerfile.bak"
-	tr '\n' '\r' <"${alpine_dir}/Dockerfile.bak" |
-		sed -E 's/ENV YARN_VERSION.*  && yarn --version..//g' |
-		tr '\r' '\n' |
-		sed '$ d' >"${alpine_dir}/Dockerfile"
-	rm "${alpine_dir}/Dockerfile.bak"
 }
 
 update_readme() {
