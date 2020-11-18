@@ -58,6 +58,20 @@ download_latest_dockerfile() {
 	rm -rf target
 }
 
+format() {
+	docker run --rm \
+		--volume "$(pwd):/tmp" \
+		--workdir /tmp \
+		node:lts-alpine \
+		sh -c " \
+		printf '%s' '@edgecommunity http://nl.alpinelinux.org/alpine/edge/community' >> /etc/apk/repositories \
+		&& apk add shellcheck shfmt@edgecommunity \
+		&& shfmt -w *.sh \
+		&& npm install --global prettier@2.1.2 \
+		&& prettier --write . \
+		&& shellcheck *.sh"
+}
+
 # https://unix.stackexchange.com/a/598047
 is_integer() {
 	case "${1#[+-]}" in
@@ -67,8 +81,60 @@ is_integer() {
 	esac
 }
 
+local_tput() {
+	if ! test_is_tty; then
+		return 0
+	fi
+	if test_command_exists 'tput'; then
+		# $@ is unquoted.
+		# shellcheck disable=SC2068
+		tput $@
+	fi
+}
+
 main() {
-	update
+	if [ "${1:-}" = "format" ]; then
+		format
+		exit
+	fi
+	if [ "${1:-}" = "update" ]; then
+		update
+		exit
+	fi
+	print_help
+}
+
+output_bold() {
+	local_tput bold
+}
+
+output_cyan() {
+	local_tput setaf 6
+}
+
+output_gray() {
+	local_tput setaf 7
+}
+
+output_reset() {
+	local_tput sgr0
+}
+
+print_help() {
+	cat <<EOF
+
+  $(output_bold)./dev.sh$(output_reset) <command>
+
+  $(output_gray)Commands:
+    $(output_gray)- Format shell scripts and Markdown files.
+    $(output_cyan)$ ./dev.sh format
+
+    $(output_gray)- Check for a newer version of node:lts-alpine and
+      updates this project if so.
+    $(output_cyan)$ ./dev.sh update
+$(output_reset)
+
+EOF
 }
 
 remove_old_directories() {
@@ -94,6 +160,16 @@ remove_yarn_from_dockerfile() {
 		tr '\r' '\n' |
 		sed '$ d' >"${alpine_dir}/Dockerfile"
 	rm "${alpine_dir}/Dockerfile.bak"
+}
+
+test_command_exists() {
+	command -v "$1" >/dev/null 2>&1
+}
+
+test_is_tty() {
+	# "No value for $TERM and no -T specified"
+	# https://askubuntu.com/questions/591937/no-value-for-term-and-no-t-specified
+	tty -s >/dev/null 2>&1
 }
 
 update() {
@@ -140,7 +216,7 @@ update() {
 	printf '%s' "${latest_node_lts_alpine_version}" >VERSION
 	build_node_no_yarn "${alpine_dir}" "${docker_tag}"
 	update_readme "${alpine_dir}" "${docker_tag}"
-	./format.sh || true
+	./dev.sh format || true
 	commit_to_git "${docker_tag}" "${latest_node_lts_alpine_version}"
 	upload_docker_images "${docker_tag}"
 	printf '\nUpdate DockerHub README.\n\n'
