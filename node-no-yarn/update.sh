@@ -1,14 +1,18 @@
 #!/bin/sh
 
+IFS=$(printf '\n\t')
 set -o errexit -o nounset
-IFS="$(printf '\n\t' '')"
 if [ -n "${BASH_VERSION:-}" ]; then
+	# shellcheck disable=SC2039
 	set -o pipefail
 fi
+# set -o xtrace
 
 build_node_no_yarn() {
+	# shellcheck disable=SC2039
 	local alpine_dir
 	alpine_dir="${1}"
+	# shellcheck disable=SC2039
 	local docker_tag
 	docker_tag="${2}"
 	cd "${alpine_dir}"
@@ -21,8 +25,10 @@ build_node_no_yarn() {
 }
 
 commit_to_git() {
+	# shellcheck disable=SC2039
 	local docker_tag
 	docker_tag="${1}"
+	# shellcheck disable=SC2039
 	local latest_node_lts_alpine_version
 	latest_node_lts_alpine_version="${2}"
 	GPG_TTY=$(tty)
@@ -35,8 +41,10 @@ commit_to_git() {
 }
 
 download_latest_dockerfile() {
+	# shellcheck disable=SC2039
 	local alpine_dir
 	alpine_dir="${1}"
+	# shellcheck disable=SC2039
 	local major_version
 	major_version="${2}"
 	rm -rf target
@@ -60,6 +68,7 @@ is_integer() {
 }
 
 main() {
+	# shellcheck disable=SC2039
 	local script_dir
 	script_dir="$(
 		cd "$(dirname "$0")"
@@ -70,8 +79,10 @@ main() {
 	# Pull the latest node:lts-alpine.
 	docker pull --quiet node:lts-alpine >/dev/null 2>&1
 
+	# shellcheck disable=SC2039
 	local current_node_lts_alpine_version
 	current_node_lts_alpine_version="$(cat VERSION)"
+	# shellcheck disable=SC2039
 	local latest_node_lts_alpine_version
 	latest_node_lts_alpine_version="$(docker run --rm node:lts-alpine node --version)"
 
@@ -80,12 +91,16 @@ main() {
 		exit
 	fi
 
+	# shellcheck disable=SC2039
 	local major_version
 	major_version=$(printf '%s' "${latest_node_lts_alpine_version}" | sed -E "s/v|\.[0-9]+//g")
+	# shellcheck disable=SC2039
 	local alpine_version
 	alpine_version=$(docker run --rm node:lts-alpine sh -c "cat /etc/os-release | grep VERSION_ID | sed -E \"s/VERSION_ID=|(\.[0-9]+$)//g\"")
+	# shellcheck disable=SC2039
 	local alpine_dir
 	alpine_dir="${major_version}/alpine${alpine_version}"
+	# shellcheck disable=SC2039
 	local docker_tag
 	docker_tag="$(printf '%s' "${latest_node_lts_alpine_version}" | sed -E "s/v//g")-alpine${alpine_version}"
 
@@ -104,6 +119,7 @@ main() {
 
 remove_old_directories() {
 	for dir in */; do
+		# shellcheck disable=SC2039
 		local dir_without_forward_slash
 		dir_without_forward_slash="$(printf '%s' "${dir}" | cut -c1-$((${#dir} - 1)))"
 		if is_integer "${dir_without_forward_slash}"; then
@@ -113,6 +129,7 @@ remove_old_directories() {
 }
 
 remove_yarn_from_dockerfile() {
+	# shellcheck disable=SC2039
 	local alpine_dir
 	alpine_dir="${1}"
 	# Remove the extra new line at the end of the file with sed '$ d'. See
@@ -126,12 +143,16 @@ remove_yarn_from_dockerfile() {
 }
 
 update_readme() {
+	# shellcheck disable=SC2039
 	local alpine_dir
 	alpine_dir="${1}"
+	# shellcheck disable=SC2039
 	local docker_tag
 	docker_tag="${2}"
+	# shellcheck disable=SC2039
 	local node_no_yarn_size
 	node_no_yarn_size=$(docker images | grep -E "^creemama/node-no-yarn\s+${docker_tag}" | awk '{ print $NF }')
+	# shellcheck disable=SC2039
 	local node_size
 	node_size=$(docker images | grep -E "^node\s+lts-alpine" | awk '{ print $NF }')
 
@@ -143,6 +164,7 @@ update_readme() {
 }
 
 upload_docker_images() {
+	# shellcheck disable=SC2039
 	local docker_tag
 	docker_tag="${1}"
 	docker push "creemama/node-no-yarn:${docker_tag}"
