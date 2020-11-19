@@ -16,15 +16,16 @@ build_node_no_yarn() {
 	local docker_tag
 	docker_tag="${2}"
 	cd "${alpine_dir}"
+	printf '\n%s%sBuilding creemama/node-no-yarn:%s...%s\n\n' "$(output_bold)" "$(output_green)" "${docker_tag}" "$(output_reset)"
 	docker build --no-cache --tag "creemama/node-no-yarn:${docker_tag}" .
 	docker tag "creemama/node-no-yarn:${docker_tag}" creemama/node-no-yarn:lts-alpine
 	cd ../..
-	printf '\nTest Docker image: '
+	printf '\n%s%sTesting creemama/node-no-yarn:%s...%s\n' "$(output_bold)" "$(output_green)" "${docker_tag}" "$(output_reset)"
 	docker run --rm creemama/node-no-yarn:lts-alpine -e "console.log(process.version)"
-	printf '\n'
 }
 
 commit_to_git() {
+	printf '\n%s%sCommitting to git...%s\n\n' "$(output_bold)" "$(output_green)" "$(output_reset)"
 	# shellcheck disable=SC2039
 	local docker_tag
 	docker_tag="${1}"
@@ -116,6 +117,10 @@ output_gray() {
 	local_tput setaf 7
 }
 
+output_green() {
+	local_tput setaf 2
+}
+
 output_reset() {
 	local_tput sgr0
 }
@@ -192,7 +197,7 @@ update() {
 	latest_node_lts_alpine_version="$(docker run --rm node:lts-alpine node --version)"
 
 	if [ "${current_node_lts_alpine_version}" = "${latest_node_lts_alpine_version}" ]; then
-		printf '%s is the latest version. There is nothing to do.\n' "${current_node_lts_alpine_version}"
+		printf '%s%s%s is the latest version. There is nothing to do.%s\n' "$(output_bold)" "$(output_green)" "${current_node_lts_alpine_version}" "$(output_reset)"
 		exit
 	fi
 
@@ -209,17 +214,18 @@ update() {
 	local docker_tag
 	docker_tag="$(printf '%s' "${latest_node_lts_alpine_version}" | sed -E "s/v//g")-alpine${alpine_version}"
 
-	printf 'Updating since %s != %s...\n' "${current_node_lts_alpine_version}" "${latest_node_lts_alpine_version}"
+	printf '\n%s%sUpdating since %s != %s...%s\n' "$(output_bold)" "$(output_green)" "${current_node_lts_alpine_version}" "${latest_node_lts_alpine_version}" "$(output_reset)"
 	remove_old_directories
 	download_latest_dockerfile "${alpine_dir}" "${major_version}"
 	remove_yarn_from_dockerfile "${alpine_dir}"
 	printf '%s' "${latest_node_lts_alpine_version}" >VERSION
 	build_node_no_yarn "${alpine_dir}" "${docker_tag}"
 	update_readme "${alpine_dir}" "${docker_tag}"
-	./dev.sh format || true
+	printf '\n%s%sFormatting the project...%s\n\n' "$(output_bold)" "$(output_green)" "$(output_reset)"
+	./dev.sh format
 	commit_to_git "${docker_tag}" "${latest_node_lts_alpine_version}"
 	upload_docker_images "${docker_tag}"
-	printf '\nUpdate DockerHub README.\n\n'
+	printf '\n%s%sRemember to update DockerHub README.%s\n\n' "$(output_bold)" "$(output_green)" "$(output_reset)"
 }
 
 update_readme() {
@@ -244,6 +250,7 @@ update_readme() {
 }
 
 upload_docker_images() {
+	printf '\n%s%sUploading images to Docker...%s\n\n' "$(output_bold)" "$(output_green)" "$(output_reset)"
 	# shellcheck disable=SC2039
 	local docker_tag
 	docker_tag="${1}"
