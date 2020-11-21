@@ -1,12 +1,12 @@
 #!/bin/sh
 
-IFS=$(printf '\n\t')
-set -o errexit -o nounset
-if [ -n "${BASH_VERSION:-}" ]; then
-	# shellcheck disable=SC2039
-	set -o pipefail
-fi
-# set -o xtrace
+script_dir="$(
+	cd "$(dirname "${0}")"
+	pwd -P
+)"
+# shellcheck source=utils.sh
+. "${script_dir}/utils.sh"
+cd "${script_dir}"
 
 build_node_no_yarn() {
 	# shellcheck disable=SC2039
@@ -73,26 +73,6 @@ format() {
 		&& shellcheck *.sh"
 }
 
-# https://unix.stackexchange.com/a/598047
-is_integer() {
-	case "${1#[+-]}" in
-	*[!0123456789]*) return 1 ;;
-	'') return 1 ;;
-	*) return 0 ;;
-	esac
-}
-
-local_tput() {
-	if ! test_is_tty; then
-		return 0
-	fi
-	if test_command_exists 'tput'; then
-		# $@ is unquoted.
-		# shellcheck disable=SC2068
-		tput $@
-	fi
-}
-
 main() {
 	if [ "${1:-}" = "format" ]; then
 		format
@@ -103,26 +83,6 @@ main() {
 		exit
 	fi
 	print_help
-}
-
-output_bold() {
-	local_tput bold
-}
-
-output_cyan() {
-	local_tput setaf 6
-}
-
-output_gray() {
-	local_tput setaf 7
-}
-
-output_green() {
-	local_tput setaf 2
-}
-
-output_reset() {
-	local_tput sgr0
 }
 
 print_help() {
@@ -167,25 +127,7 @@ remove_yarn_from_dockerfile() {
 	rm "${alpine_dir}/Dockerfile.bak"
 }
 
-test_command_exists() {
-	command -v "$1" >/dev/null 2>&1
-}
-
-test_is_tty() {
-	# "No value for $TERM and no -T specified"
-	# https://askubuntu.com/questions/591937/no-value-for-term-and-no-t-specified
-	tty -s >/dev/null 2>&1
-}
-
 update() {
-	# shellcheck disable=SC2039
-	local script_dir
-	script_dir="$(
-		cd "$(dirname "$0")"
-		pwd -P
-	)"
-	cd "${script_dir}"
-
 	# Pull the latest node:lts-alpine.
 	docker pull --quiet node:lts-alpine >/dev/null 2>&1
 
