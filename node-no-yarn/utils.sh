@@ -34,31 +34,31 @@ local_tput() {
 	fi
 }
 
-output_bold() {
+tbold() {
 	local_tput bold
 }
 
-output_cyan() {
+tcyan() {
 	local_tput setaf 6
 }
 
-output_gray() {
+tgray() {
 	local_tput setaf 7
 }
 
-output_green() {
+tgreen() {
 	local_tput setaf 2
 }
 
-output_red() {
+tred() {
 	local_tput setaf 1
 }
 
-output_reset() {
+treset() {
 	local_tput sgr0
 }
 
-output_yellow() {
+tyellow() {
 	local_tput setaf 3
 }
 
