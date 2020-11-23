@@ -1,0 +1,3 @@
+[submodule "node-no-yarn/shellutil"]
+	path = node-no-yarn/shellutil
+	url = https://github.com/creemama/shellutil
