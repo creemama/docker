@@ -5,6 +5,9 @@ script_dir="$(
 	pwd -P
 )"
 cd "$script_dir"
+if [ ! -f shellutil/shellutil.sh ]; then
+	git submodule update --init
+fi
 # shellcheck source=shellutil/mainutil.sh
 . shellutil/mainutil.sh
 # shellcheck source=shellutil/shellutil.sh
@@ -16,7 +19,7 @@ main() {
 	local command_help
 	command_help='docker-format - Format shell scripts and Markdown files.
 git - Run git.
-update - Check for a newer version of node:lts-alpine and update this project if so.'
+update - Check for a newer version of mariadb:latest and update this project if so.'
 	# shellcheck disable=SC2039
 	local commands
 	commands="$(main_extract_commands "$command_help")"
@@ -103,6 +106,8 @@ update() {
 	docker tag "$image" "$latest_image"
 	docker push "$latest_image"
 	docker rmi "$latest_image"
+
+	printf '\n%s%sRemember to update DockerHub README.%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 }
 
 main "$@"
