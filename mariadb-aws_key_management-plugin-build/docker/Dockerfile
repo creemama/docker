@@ -1,9 +1,14 @@
 FROM ubuntu:bionic
 
-RUN printf "%s\n" "deb-src http://security.ubuntu.com/ubuntu/ bionic-security universe" \
+# https://serverfault.com/questions/949991/how-to-install-tzdata-on-a-ubuntu-docker-image
+# "apt-get -y build-dep mariadb-server" installs tzdata, which asks for input if
+# we do not set DEBIAN_FRONTEND="noninteractive".
+
+RUN set -o xtrace \
+ && printf "%s\n" "deb-src http://security.ubuntu.com/ubuntu/ bionic-security universe" \
  >> /etc/apt/sources.list \
  && apt-get -y update \
- && apt-get -y build-dep mariadb-server \
+ && DEBIAN_FRONTEND=noninteractive TZ="America/New_York" apt-get -y build-dep mariadb-server \
  && apt-get -y install \
       git \
       gnutls-dev \

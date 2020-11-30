@@ -36,17 +36,69 @@ update - Check for a newer version of node:lts-alpine and update this project if
 }
 
 update() {
+	docker pull --quiet mariadb:latest >/dev/null 2>&1
+
+	# shellcheck disable=SC2039
+	local current_image_version
+	current_image_version="$(cat VERSION)"
+	# shellcheck disable=SC2039
+	local ubuntu_codename
+	# https://linuxize.com/post/how-to-check-your-ubuntu-version/
+	ubuntu_codename="$(docker run --rm mariadb:latest sh -c \
+		"cat /etc/os-release | grep UBUNTU_CODENAME= | sed 's/UBUNTU_CODENAME=//'")"
+	# shellcheck disable=SC2039
+	local mariadb_version
+	mariadb_version="$(docker run --rm mariadb:latest sh -c \
+		"mariadb --version | sed -E 's/^.*Distrib ([^-]+).*/\1/'")"
+	# shellcheck disable=SC2039
+	local latest_image_version
+	latest_image_version="$mariadb_version"-"$ubuntu_codename"
 	# shellcheck disable=SC2039
 	local image
-	image=creemama/mariadb-aws_key_management-plugin-build:"10.4.7-bionic"
+	image=creemama/mariadb-aws_key_management-plugin-build:"$latest_image_version"
 	# shellcheck disable=SC2039
 	local latest_image
 	latest_image=creemama/mariadb-aws_key_management-plugin-build:latest
+	# shellcheck disable=SC2039
+	local git_tag
+	git_tag=mariadb-aws_key_management-plugin-build-$latest_image_version
+
+	if [ "$current_image_version" = "$latest_image_version" ]; then
+		printf '%s%s%s is the latest version. There is nothing to do.%s\n' "$(tbold)" "$(tgreen)" "$current_image_version" "$(treset)"
+		exit
+	fi
+	printf '\n%s%sUpdating since %s != %s...%s\n' "$(tbold)" "$(tgreen)" "$current_image_version" "$latest_image_version" "$(treset)"
+
+	sed -E -i "" \
+		's/^FROM ubuntu:.*$/FROM ubuntu:'"$ubuntu_codename"'/;s/ [a-z]+-security/ '"$ubuntu_codename"'-security/;s/mariadb-[0-9]+\.[0-9]+\.[0-9]+/mariadb-'"$mariadb_version"'/' \
+		docker/Dockerfile
+	# shellcheck disable=SC2016
+	sed -E -i "" \
+		's/`[0-9]+\.[0-9]+\.[0-9]+-[^`]+`/`'"$latest_image_version"'`/' \
+		README.md
+	printf %s "$latest_image_version" >VERSION
+
+	printf '\n%s%sFormatting the project...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
+	./dev.sh docker-format
+
+	printf '\n%s%sBuilding %s...%s\n\n' "$(tbold)" "$(tgreen)" "$image" "$(treset)"
+	docker pull ubuntu:"$ubuntu_codename"
 	(
 		cd docker
-		docker build --tag "$image" .
+		docker build --no-cache --tag "$image" .
 	)
 	docker run --name aws_key_management_build --rm "$image"
+
+	printf '\n%s%sCommitting to git...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
+	GPG_TTY=$(tty)
+	export GPG_TTY
+	git add -A
+	git commit -m "Bump the version of mariadb-aws_key_management-plugin-build to $latest_image_version"
+	git tag "$git_tag"
+	git push origin master
+	git push origin "$git_tag"
+
+	printf '\n%s%sUploading images to Docker...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	docker push "$image"
 	docker tag "$image" "$latest_image"
 	docker push "$latest_image"
