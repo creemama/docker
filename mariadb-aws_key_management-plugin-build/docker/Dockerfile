@@ -1,11 +1,11 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 # https://serverfault.com/questions/949991/how-to-install-tzdata-on-a-ubuntu-docker-image
 # "apt-get -y build-dep mariadb-server" installs tzdata, which asks for input if
 # we do not set DEBIAN_FRONTEND="noninteractive".
 
 RUN set -o xtrace \
- && printf "%s\n" "deb-src http://security.ubuntu.com/ubuntu/ bionic-security universe" \
+ && printf "%s\n" "deb-src http://security.ubuntu.com/ubuntu/ focal-security universe" \
  >> /etc/apt/sources.list \
  && apt-get -y update \
  && DEBIAN_FRONTEND=noninteractive TZ="America/New_York" apt-get -y build-dep mariadb-server \
@@ -17,7 +17,7 @@ RUN set -o xtrace \
       uuid-dev \
  && cd /usr/local/src \
  && git clone \
-      --branch mariadb-10.4.7 \
+      --branch mariadb-10.5.8 \
       --depth 1 \
       https://github.com/MariaDB/server.git \
  && mkdir build-mariadb \
