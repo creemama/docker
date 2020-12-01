@@ -1,4 +1,4 @@
-FROM nginx:1.17.10-alpine
+FROM nginx:1.18.0-alpine
 
 # Compile https://github.com/openresty/headers-more-nginx-module.
 
@@ -35,20 +35,20 @@ RUN set -o xtrace \
       alpine-sdk \
       findutils \
  && wget https://nginx.org/keys/mdounin.key \
- && wget https://nginx.org/download/nginx-1.17.10.tar.gz.asc \
- && wget https://nginx.org/download/nginx-1.17.10.tar.gz \
+ && wget https://nginx.org/download/nginx-1.18.0.tar.gz.asc \
+ && wget https://nginx.org/download/nginx-1.18.0.tar.gz \
  && wget https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz \
  && gpg --import mdounin.key \
- && gpg --verify nginx-1.17.10.tar.gz.asc nginx-1.17.10.tar.gz \
+ && gpg --verify nginx-1.18.0.tar.gz.asc nginx-1.18.0.tar.gz \
  && tar -xzvf v0.33.tar.gz \
- && tar -xzvf nginx-1.17.10.tar.gz \
- && cd nginx-1.17.10 \
+ && tar -xzvf nginx-1.18.0.tar.gz \
+ && cd nginx-1.18.0 \
  && eval ./configure $(nginx -V 2>&1 | grep 'configure arguments: ' | sed 's/configure arguments: //') \
       --add-dynamic-module=$(pwd)/../headers-more-nginx-module-0.33 \
  && make \
  && make install
 
-FROM nginx:1.17.10-alpine
+FROM nginx:1.18.0-alpine
 
 # Organize COPY commands by destination path.
 COPY default.conf /etc/nginx/conf.d/default.conf
