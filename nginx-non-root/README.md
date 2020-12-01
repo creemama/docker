@@ -2,8 +2,7 @@
 
 # Supported tags and respective `Dockerfile` links
 
-- [`1.17.10-alpine`, `mainline-alpine`, `1-alpine`, `1.17-alpine`, `alpine`, `latest`
-  _(Dockerfile)_](https://github.com/creemama/docker/blob/master/nginx-non-root/docker/Dockerfile)
+- [`1.17.10-alpine`, `stable-alpine`](https://github.com/creemama/docker/blob/master/nginx-non-root/docker/Dockerfile)
 
 # Running nginx as a non-root user
 
@@ -60,7 +59,7 @@ healthcheck:
 Use the following Docker command to try out this image:
 
 ```
-docker run -p 8080:8080 --rm creemama/nginx-non-root:latest
+docker run -p 8080:8080 --rm creemama/nginx-non-root:stable-alpine
 ```
 
 Afterwards, visit [http://localhost:8080](http://localhost:8080) in a browser.

@@ -1,9 +1,10 @@
 #!/bin/sh
 
 set -o errexit -o nounset
-IFS="$(printf '\n\t' '')"
+IFS="$(printf '\n\t')"
 if [ -n "${BASH_VERSION:-}" ]; then
-  set -o pipefail
+	# shellcheck disable=SC2039
+	set -o pipefail
 fi
 
 # If using proxy_pass in default.conf, wait for the proxied server to be
@@ -16,4 +17,4 @@ fi
 
 lazy-load-ocsp.sh &
 
-exec nginx -g "daemon off;"
+exec nginx -g 'daemon off;'

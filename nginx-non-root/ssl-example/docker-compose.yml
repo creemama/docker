@@ -1,19 +1,27 @@
-version: '3.7'
+version: "3.7"
 services:
   nginx-ssl-example:
     cap_drop:
       - ALL
     command: start-server.sh
-    container_name: 'nginx-ssl-example'
+    container_name: "nginx-ssl-example"
     environment:
       - TZ=EST5EDT
     healthcheck:
       interval: 5m
       retries: 3
       start_period: 1m
-      test: ["CMD", "wget", "--no-check-certificate", "-q", "--spider", "https://localhost:8443"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-check-certificate",
+          "-q",
+          "--spider",
+          "https://localhost:8443",
+        ]
       timeout: 30s
-    image: creemama/nginx-non-root:1.17.10-alpine
+    image: creemama/nginx-non-root:stable-alpine
     ports:
       # HOST:CONTAINER
       - 8080:8080

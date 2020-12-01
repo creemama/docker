@@ -4,9 +4,10 @@
 # Test with Firefox. If Firefox is the first to connect, the connection fails.
 
 set -o errexit -o nounset
-IFS="$(printf '\n\t' '')"
+IFS="$(printf '\n\t')"
 if [ -n "${BASH_VERSION:-}" ]; then
-  set -o pipefail
+	# shellcheck disable=SC2039
+	set -o pipefail
 fi
 
 sleep 1s
