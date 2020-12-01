@@ -5,13 +5,13 @@ script_dir="$(
 	pwd -P
 )"
 cd "$script_dir"
-if [ ! -f shellutil/shellutil.sh ]; then
+if [ ! -f ../shellutil/shellutil.sh ]; then
 	git submodule update --init
 fi
-# shellcheck source=shellutil/mainutil.sh
-. shellutil/mainutil.sh
-# shellcheck source=shellutil/shellutil.sh
-. shellutil/shellutil.sh
+# shellcheck source=../shellutil/mainutil.sh
+. ../shellutil/mainutil.sh
+# shellcheck source=../shellutil/shellutil.sh
+. ../shellutil/shellutil.sh
 # set -o xtrace
 
 build_node_no_yarn() {
@@ -78,10 +78,14 @@ update - Check for a newer version of node:lts-alpine and update this project if
 	if [ -z "${1:-}" ]; then
 		main_exit_with_no_command_error "$command_help"
 	elif [ "$1" = "$(arg 0 $commands)" ]; then
-		./shellutil/format.sh docker-format
+		(
+			# We go up one directory to give the Docker container access to shellutil.
+			cd ..
+			shellutil/format.sh docker-format node-no-yarn
+		)
 	elif [ "$1" = "$(arg 1 $commands)" ]; then
 		shift
-		./shellutil/git.sh git "$@"
+		../shellutil/git.sh git "$@"
 	elif [ "$1" = "$(arg 2 $commands)" ]; then
 		update
 	else

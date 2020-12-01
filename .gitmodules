@@ -1,6 +1,3 @@
-[submodule "node-no-yarn/shellutil"]
-	path = node-no-yarn/shellutil
-	url = https://github.com/creemama/shellutil
-[submodule "mariadb-aws_key_management-plugin-build/shellutil"]
-	path = mariadb-aws_key_management-plugin-build/shellutil
+[submodule "shellutil"]
+	path = shellutil
 	url = https://github.com/creemama/shellutil
