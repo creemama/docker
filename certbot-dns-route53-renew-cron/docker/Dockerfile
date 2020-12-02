@@ -7,9 +7,9 @@ COPY certbot-non-root.sh /usr/local/bin/certbot-non-root
 # https://pypi.org/project/schedule/
 RUN addgroup -g 1000 certbot \
  && adduser -D -G certbot -s /bin/sh -u 1000 certbot \
- && apk add --no-cache --update tini=0.18.0-r0 \
- && pip install --upgrade 'pip==19.2.1' \
- && pip install --upgrade 'schedule==0.6.0'
+ && apk add --no-cache --update tini~=0.18 \
+ && pip install --upgrade pip==19.2.1 \
+ && pip install --upgrade schedule==0.6.0
 
 USER certbot
 WORKDIR /home/certbot

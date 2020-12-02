@@ -15,6 +15,7 @@ fi
 # set -o xtrace
 
 format() {
+	certbot-dns-route53-renew-cron/dev.sh docker-format
 	mariadb-aws_key_management-plugin-build/dev.sh docker-format
 	nginx-non-root/dev.sh docker-format
 	node-no-yarn/dev.sh docker-format
@@ -45,6 +46,7 @@ update - Run update in each subproject.'
 }
 
 update() {
+	certbot-dns-route53-renew-cron/dev.sh update
 	mariadb-aws_key_management-plugin-build/dev.sh update
 	nginx-non-root/dev.sh update
 	node-no-yarn/dev.sh update
