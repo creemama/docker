@@ -2,4 +2,4 @@
 
 # Supported tags and respective `Dockerfile` links
 
-- [`v1.10.0`, `latest` _(docker/certbot-dns-route53-renew-cron/Dockerfile)_](https://github.com/creemama/docker/blob/master/certbot-dns-route53-renew-cron/Dockerfile)
+- [`v1.10.0`, `latest`](https://github.com/creemama/docker/blob/master/certbot-dns-route53-renew-cron/docker/Dockerfile)
