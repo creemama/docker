@@ -116,6 +116,7 @@ update() {
 
 	printf '\n%s%sUploading images to Docker...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	docker push "$image"
+	docker tag "$image" "$latest_image"
 	docker push "$latest_image"
 	docker rmi "$latest_image"
 
