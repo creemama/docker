@@ -100,7 +100,7 @@ update() {
 	GPG_TTY=$(tty)
 	export GPG_TTY
 	git add -A
-	git commit -m "Bump the version of mariadb-aws_key_management-plugin-build to $latest_image_version"
+	git commit -m "Bump the version of mariadb-aws_key_management-plugin-build to $latest_image_version" -S
 	git tag "$git_tag"
 	git push origin master
 	git push origin "$git_tag"

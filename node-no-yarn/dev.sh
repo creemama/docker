@@ -41,7 +41,7 @@ commit_to_git() {
 	GPG_TTY=$(tty)
 	export GPG_TTY
 	git add -A
-	git commit -m "Bump the version of node-no-yarn to $latest_node_lts_alpine_version"
+	git commit -m "Bump the version of node-no-yarn to $latest_node_lts_alpine_version" -S
 	git tag "node-no-yarn-$docker_tag"
 	git push origin master
 	git push origin "node-no-yarn-$docker_tag"
