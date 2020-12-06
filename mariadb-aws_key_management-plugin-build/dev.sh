@@ -52,7 +52,7 @@ update() {
 	local ubuntu_codename
 	# https://linuxize.com/post/how-to-check-your-ubuntu-version/
 	ubuntu_codename="$(docker run --rm mariadb:latest sh -c \
-		"cat /etc/os-release | grep UBUNTU_CODENAME= | sed 's/UBUNTU_CODENAME=//'")"
+		"grep UBUNTU_CODENAME= </etc/os-release | sed 's/UBUNTU_CODENAME=//'")"
 	# shellcheck disable=SC2039
 	local mariadb_version
 	mariadb_version="$(docker run --rm mariadb:latest sh -c \
