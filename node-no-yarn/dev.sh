@@ -57,11 +57,11 @@ download_latest_dockerfile() {
 	rm -rf target
 	mkdir target
 	cd target
-	curl --location --remote-name --silent https://github.com/nodejs/docker-node/archive/master.zip
-	unzip -q master.zip
+	curl --location --remote-name --silent https://github.com/nodejs/docker-node/archive/refs/heads/main.zip
+	unzip -q main.zip
 	cd ..
 	mkdir -p "$major_version"
-	cp -r "target/docker-node-master/$alpine_dir" "$major_version"
+	cp -r "target/docker-node-main/$alpine_dir" "$major_version"
 	rm -rf target
 }
 
