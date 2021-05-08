@@ -17,7 +17,7 @@ RUN set -o xtrace \
       uuid-dev \
  && cd /usr/local/src \
  && git clone \
-      --branch mariadb-10.5.8 \
+      --branch mariadb-10.5.9 \
       --depth 1 \
       https://github.com/MariaDB/server.git \
  && mkdir build-mariadb \
