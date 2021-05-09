@@ -7,7 +7,7 @@ if [ -n "${BASH_VERSION:-}" ]; then
 	set -o pipefail
 fi
 
-# Use this script to try certbot-non-root.sh renew --dry-run.
+# Use this script to try certbot-non-root renew --dry-run.
 
 certbot \
 	--config-dir \
