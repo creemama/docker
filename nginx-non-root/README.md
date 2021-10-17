@@ -2,7 +2,7 @@
 
 # Supported tags and respective `Dockerfile` links
 
-- [`1.20.0-alpine`, `stable-alpine`](https://github.com/creemama/docker/blob/master/nginx-non-root/docker/Dockerfile)
+- [`1.20.1-alpine`, `stable-alpine`](https://github.com/creemama/docker/blob/master/nginx-non-root/docker/Dockerfile)
 
 # Running nginx as a non-root user
 
