@@ -2,7 +2,7 @@
 
 # Supported tags and respective `Dockerfile` links
 
-- [`10.5.9-focal`, `latest`](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/docker/Dockerfile)
+- [`10.6.4-focal`, `latest`](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/docker/Dockerfile)
 
 # The AWS Key Management Plugin for MariaDB
 
