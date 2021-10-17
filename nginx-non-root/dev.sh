@@ -103,11 +103,11 @@ update() {
 		docker build --no-cache --tag "$image" .
 	)
 
-	printf '\n%s%sTry http://localhost:8080 in a browser...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
+	printf '\n%s%sTry http://localhost:8080 in a browser and type Ctrl+C when done...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	docker run --name nginx-non-root-test -p 8080:8080 --rm "$image"
 
 	docker tag "$image" "$stable_image"
-	printf '\n%s%sTry https://localhost:8443 in a browser...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
+	printf '\n%s%sTry https://localhost:8443 in a browser and type Ctrl+C when done...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	(
 		cd ssl-example
 		docker-compose up
