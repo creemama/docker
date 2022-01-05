@@ -1,4 +1,4 @@
-FROM certbot/dns-route53:v1.21.0
+FROM certbot/dns-route53:v1.22.0
 
 COPY certbot-renew.py /usr/local/bin/certbot-renew.py
 COPY certbot-non-root.sh /usr/local/bin/certbot-non-root
