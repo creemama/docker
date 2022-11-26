@@ -1,4 +1,4 @@
-FROM nginx:1.20.1-alpine
+FROM nginx:1.22.1-alpine
 
 # Compile https://github.com/openresty/headers-more-nginx-module.
 
@@ -14,6 +14,9 @@ FROM nginx:1.20.1-alpine
 # ./configure: error: invalid option "-fomit-frame-pointer'"
 # See
 # https://stackoverflow.com/questions/39585662/bash-shell-expand-arguments-with-spaces-from-variable/39586326 .
+
+# Find the GPG keys for mdounin.key and thresh.key here:
+# https://nginx.org/en/pgp_keys.html.
 
 RUN set -o xtrace \
  && apk add --no-cache \
@@ -35,20 +38,23 @@ RUN set -o xtrace \
       alpine-sdk \
       findutils \
  && wget https://nginx.org/keys/mdounin.key \
- && wget https://nginx.org/download/nginx-1.20.1.tar.gz.asc \
- && wget https://nginx.org/download/nginx-1.20.1.tar.gz \
- && wget https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz \
+ && wget https://nginx.org/keys/thresh.key \
+ && wget https://nginx.org/download/nginx-1.22.1.tar.gz.asc \
+ && wget https://nginx.org/download/nginx-1.22.1.tar.gz \
+ && wget https://github.com/openresty/headers-more-nginx-module/archive/v0.34.tar.gz \
  && gpg --import mdounin.key \
- && gpg --verify nginx-1.20.1.tar.gz.asc nginx-1.20.1.tar.gz \
- && tar -xzvf v0.33.tar.gz \
- && tar -xzvf nginx-1.20.1.tar.gz \
- && cd nginx-1.20.1 \
+ && gpg --import thresh.key \
+ && gpg --verify nginx-1.22.1.tar.gz.asc nginx-1.22.1.tar.gz \
+ && tar -xzvf v0.34.tar.gz \
+ && tar -xzvf nginx-1.22.1.tar.gz \
+ && cd nginx-1.22.1 \
  && eval ./configure $(nginx -V 2>&1 | grep 'configure arguments: ' | sed 's/configure arguments: //') \
-      --add-dynamic-module=$(pwd)/../headers-more-nginx-module-0.33 \
+      --add-dynamic-module=$(pwd)/../headers-more-nginx-module-0.34 \
  && make \
- && make install
+ && make install \
+ && ls /usr/lib/nginx/modules/ngx_http_headers_more_filter_module.so
 
-FROM nginx:1.20.1-alpine
+FROM nginx:1.22.1-alpine
 
 # Organize COPY commands by destination path.
 COPY default.conf /etc/nginx/conf.d/default.conf
