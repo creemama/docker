@@ -47,7 +47,6 @@ update - Check for a newer version of nginx:stable-alpine and update this projec
 	fi
 }
 
-
 run_docker_update() {
 	docker pull creemama/node-no-yarn:lts-alpine
 	docker run -it --rm \
