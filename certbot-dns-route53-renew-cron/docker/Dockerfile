@@ -1,4 +1,4 @@
-FROM certbot/dns-route53:v1.22.0
+FROM certbot/dns-route53:v1.29.0
 
 COPY certbot-renew.py /usr/local/bin/certbot-renew.py
 COPY certbot-non-root.sh /usr/local/bin/certbot-non-root
@@ -8,7 +8,7 @@ COPY certbot-non-root.sh /usr/local/bin/certbot-non-root
 RUN addgroup -g 1000 certbot \
  && adduser -D -G certbot -s /bin/sh -u 1000 certbot \
  && apk add --no-cache --update tini~=0.19 \
- && pip install --upgrade pip==21.3.1 \
+ && pip install --upgrade pip==22.2.1 \
  && pip install --upgrade schedule==1.1.0
 
 USER certbot

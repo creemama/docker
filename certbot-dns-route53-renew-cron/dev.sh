@@ -14,7 +14,7 @@ fi
 . ../shellutil/shellutil.sh
 # shellcheck source=../shellutil/updateutil.sh
 . ../shellutil/updateutil.sh
-# set -o xtrace
+set -o xtrace
 
 main() {
 	# shellcheck disable=SC2039
