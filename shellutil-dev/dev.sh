@@ -61,6 +61,7 @@ update() {
 	apk_update_package_version git docker/Dockerfile
 	apk_update_package_version git-gitk docker/Dockerfile
 	apk_update_package_version gnupg docker/Dockerfile
+	apk_update_package_version ncurses docker/Dockerfile
 	apk_update_package_version openssh docker/Dockerfile
 	apk_update_package_version shellcheck docker/Dockerfile
 	apk_update_package_version shfmt docker/Dockerfile
