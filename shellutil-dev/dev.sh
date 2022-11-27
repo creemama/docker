@@ -58,15 +58,14 @@ run_docker_update() {
 
 update() {
 	apk_update_node_image_version docker/Dockerfile
-	apk_update_package_version shellcheck docker/Dockerfile
-	npm_update_package_version prettier docker/Dockerfile
-
 	apk_update_package_version git docker/Dockerfile
 	apk_update_package_version git-gitk docker/Dockerfile
 	apk_update_package_version gnupg docker/Dockerfile
 	apk_update_package_version openssh docker/Dockerfile
-	apk_update_package_version terminus-font docker/Dockerfile
+	apk_update_package_version shellcheck docker/Dockerfile
 	apk_update_package_version shfmt docker/Dockerfile
+	apk_update_package_version terminus-font docker/Dockerfile
+	npm_update_package_version prettier docker/Dockerfile
 
 	# As a submodule, git status might not work in a Docker container mounted to this
 	# script_dir.
