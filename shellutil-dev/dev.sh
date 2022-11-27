@@ -33,7 +33,7 @@ update - Check for a newer version of nginx:stable-alpine and update this projec
 		(
 			# We go up one directory to give the Docker container access to shellutil.
 			cd ..
-			shellutil/format.sh docker-shell-format node-dev
+			shellutil/format.sh docker-shell-format shellutil-dev
 		)
 	elif [ "$1" = "$(arg 1 $commands)" ]; then
 		run_docker_update
@@ -51,7 +51,7 @@ run_docker_update() {
 	docker pull creemama/node-no-yarn:lts-alpine
 	docker run -it --rm \
 		--volume "$(pwd)/..":/tmp \
-		--workdir /tmp/node-dev \
+		--workdir /tmp/shellutil-dev \
 		creemama/node-no-yarn:lts-alpine \
 		sh -c './dev.sh update'
 }
