@@ -6,7 +6,7 @@
 set -o errexit -o nounset
 IFS="$(printf '\n\t')"
 if [ -n "${BASH_VERSION:-}" ]; then
-	# shellcheck disable=SC2039
+	# shellcheck disable=SC3040
 	set -o pipefail
 fi
 

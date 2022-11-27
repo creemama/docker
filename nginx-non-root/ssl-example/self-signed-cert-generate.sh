@@ -3,7 +3,7 @@
 set -o errexit -o nounset
 IFS="$(printf '\n\t')"
 if [ -n "${BASH_VERSION:-}" ]; then
-	# shellcheck disable=SC2039
+	# shellcheck disable=SC3040
 	set -o pipefail
 fi
 
@@ -13,7 +13,6 @@ main() {
 		exit
 	fi
 
-	# shellcheck disable=SC2039
 	local script_dir
 	script_dir="$(
 		cd "$(dirname "$0")"

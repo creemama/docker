@@ -12,7 +12,7 @@ fi
 . ../shellutil/mainutil.sh
 # shellcheck source=../shellutil/shellutil.sh
 . ../shellutil/shellutil.sh
-# shellcheck source=updateutil.sh
+# shellcheck source=../shellutil/updateutil.sh
 . ../shellutil/updateutil.sh
 # set -o xtrace
 
@@ -25,7 +25,6 @@ build() {
 }
 
 main() {
-	# shellcheck disable=SC2039
 	local command_help
 	command_help='build - Build the creemama/shellutil-dev Docker image.
 docker-format - Format shell scripts and Markdown files.
@@ -33,7 +32,6 @@ docker-update - Run update using a Docker container.
 git - Run git.
 push - Push creemama/shellutil-dev to Docker Hub.
 update - Check for a newer version of nginx:stable-alpine and update this project if so.'
-	# shellcheck disable=SC2039
 	local commands
 	commands="$(main_extract_commands "$command_help")"
 	# shellcheck disable=SC2086

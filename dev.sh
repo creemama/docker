@@ -22,12 +22,10 @@ format() {
 }
 
 main() {
-	# shellcheck disable=SC2039
 	local command_help
 	command_help='docker-format - Format shell scripts and Markdown files.
 git - Run git.
 update - Run update in each subproject.'
-	# shellcheck disable=SC2039
 	local commands
 	commands="$(main_extract_commands "$command_help")"
 	# shellcheck disable=SC2086

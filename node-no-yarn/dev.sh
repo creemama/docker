@@ -184,7 +184,6 @@ update_readme() {
 
 upload_docker_images() {
 	printf '\n%s%sUploading images to Docker...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
-	# shellcheck disable=SC2039
 	local docker_tag
 	docker_tag="$1"
 	docker push "creemama/node-no-yarn:$docker_tag"
