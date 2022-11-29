@@ -20,7 +20,7 @@ build() {
 	local version
 	version="$(head -n 1 docker/Dockerfile | sed -E "s#.*:(.*)#\1#")"
 	docker build --tag "creemama/shellutil-dev:$version" docker
-	docker tag "creemama/shellutil-dev:$version" creemama/shellutil-dev:lts-alpine
+	#docker tag "creemama/shellutil-dev:$version" creemama/shellutil-dev:lts-alpine
 	docker images | grep shellutil-dev
 }
 

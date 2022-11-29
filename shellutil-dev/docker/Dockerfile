@@ -1,4 +1,4 @@
-FROM creemama/node-no-yarn:18.12.1-alpine3.16
+FROM creemama/node-no-yarn:16.18.1-alpine3.16
 
 # ncurses has tput in Alpine Linux.
 
