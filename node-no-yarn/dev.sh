@@ -24,10 +24,10 @@ build_node_no_yarn() {
 	cd "$alpine_dir"
 	printf '\n%s%sBuilding creemama/node-no-yarn:%s...%s\n\n' "$(tbold)" "$(tgreen)" "$docker_tag" "$(treset)"
 	docker build --no-cache --tag "creemama/node-no-yarn:$docker_tag" .
-	#docker tag "creemama/node-no-yarn:$docker_tag" creemama/node-no-yarn:lts-alpine
+	docker tag "creemama/node-no-yarn:$docker_tag" creemama/node-no-yarn:lts-alpine
 	cd ../..
 	printf '\n%s%sTesting creemama/node-no-yarn:%s...%s\n' "$(tbold)" "$(tgreen)" "$docker_tag" "$(treset)"
-	docker run --rm "creemama/node-no-yarn:$docker_tag" -e 'console.log(process.version)'
+	docker run --rm creemama/node-no-yarn:lts-alpine -e 'console.log(process.version)'
 }
 
 commit_to_git() {
@@ -43,7 +43,7 @@ commit_to_git() {
 	git add -A
 	git commit -m "Bump the version of node-no-yarn to $latest_node_lts_alpine_version" -S
 	git tag "node-no-yarn-$docker_tag"
-	#git push origin master
+	git push origin master
 	git push origin "node-no-yarn-$docker_tag"
 }
 
@@ -70,7 +70,7 @@ main() {
 	local command_help
 	command_help='docker-format - Format shell scripts and Markdown files.
 git - Run git.
-update - Check for a newer version of node:16-alpine and update this project if so.'
+update - Check for a newer version of node:lts-alpine and update this project if so.'
 	# shellcheck disable=SC2039
 	local commands
 	commands="$(main_extract_commands "$command_help")"
@@ -119,27 +119,27 @@ remove_yarn_from_dockerfile() {
 }
 
 update() {
-	# Pull the latest node:16-alpine.
-	docker pull --quiet node:16-alpine >/dev/null 2>&1
+	# Pull the latest node:lts-alpine.
+	docker pull --quiet node:lts-alpine >/dev/null 2>&1
 
 	# shellcheck disable=SC2039
 	local current_node_lts_alpine_version
 	current_node_lts_alpine_version="$(cat VERSION)"
 	# shellcheck disable=SC2039
 	local latest_node_lts_alpine_version
-	latest_node_lts_alpine_version="$(docker run --rm node:16-alpine node --version)"
+	latest_node_lts_alpine_version="$(docker run --rm node:lts-alpine node --version)"
 
-	#if [ "$current_node_lts_alpine_version" = "$latest_node_lts_alpine_version" ]; then
-	#	printf '%s%s%s is the latest version. There is nothing to do.%s\n' "$(tbold)" "$(tgreen)" "$current_node_lts_alpine_version" "$(treset)"
-	#	exit
-	#fi
+	if [ "$current_node_lts_alpine_version" = "$latest_node_lts_alpine_version" ]; then
+		printf '%s%s%s is the latest version. There is nothing to do.%s\n' "$(tbold)" "$(tgreen)" "$current_node_lts_alpine_version" "$(treset)"
+		exit
+	fi
 
 	# shellcheck disable=SC2039
 	local major_version
 	major_version="$(printf %s "$latest_node_lts_alpine_version" | sed -E 's/v|\.[0-9]+//g')"
 	# shellcheck disable=SC2039
 	local alpine_version
-	alpine_version="$(docker run --rm node:16-alpine sh -c 'cat /etc/os-release | grep VERSION_ID | sed -E "s/VERSION_ID=|(\.[0-9]+$)//g"')"
+	alpine_version="$(docker run --rm node:lts-alpine sh -c 'cat /etc/os-release | grep VERSION_ID | sed -E "s/VERSION_ID=|(\.[0-9]+$)//g"')"
 	# shellcheck disable=SC2039
 	local alpine_dir
 	alpine_dir="$major_version/alpine$alpine_version"
@@ -173,7 +173,7 @@ update_readme() {
 	node_no_yarn_size=$(docker images | grep -E "^creemama/node-no-yarn\s+$docker_tag" | awk '{ print $NF }')
 	# shellcheck disable=SC2039
 	local node_size
-	node_size=$(docker images | grep -E '^node\s+16-alpine' | awk '{ print $NF }')
+	node_size=$(docker images | grep -E '^node\s+lts-alpine' | awk '{ print $NF }')
 
 	rm -f README.md
 	tr '\n' '\r' <README.template.md |
@@ -187,7 +187,7 @@ upload_docker_images() {
 	local docker_tag
 	docker_tag="$1"
 	docker push "creemama/node-no-yarn:$docker_tag"
-	#docker push creemama/node-no-yarn:lts-alpine
+	docker push creemama/node-no-yarn:lts-alpine
 }
 
 main "$@"
