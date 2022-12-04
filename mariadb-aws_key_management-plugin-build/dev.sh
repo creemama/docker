@@ -42,7 +42,7 @@ update - Check for a newer version of mariadb:latest and update this project if 
 
 update() {
 	local tag
-	tag=latest
+	tag=10.4
 	docker pull --quiet "mariadb:$tag" >/dev/null 2>&1
 
 	local current_image_version
