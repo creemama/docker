@@ -43,7 +43,9 @@ update - Check for a newer version of mariadb:latest and update this project if 
 }
 
 update() {
-	docker pull --quiet mariadb:latest >/dev/null 2>&1
+	local tag
+	tag=latest
+	docker pull --quiet "mariadb:$tag" >/dev/null 2>&1
 
 	# shellcheck disable=SC2039
 	local current_image_version
@@ -51,11 +53,11 @@ update() {
 	# shellcheck disable=SC2039
 	local ubuntu_codename
 	# https://linuxize.com/post/how-to-check-your-ubuntu-version/
-	ubuntu_codename="$(docker run --rm mariadb:latest sh -c \
+	ubuntu_codename="$(docker run --rm mariadb:$tag sh -c \
 		"grep UBUNTU_CODENAME= </etc/os-release | sed 's/UBUNTU_CODENAME=//'")"
 	# shellcheck disable=SC2039
 	local mariadb_version
-	mariadb_version="$(docker run --rm mariadb:latest sh -c \
+	mariadb_version="$(docker run --rm mariadb:$tag sh -c \
 		"mariadb --version | sed -E 's/^.*Distrib ([^-]+).*/\1/'")"
 	# shellcheck disable=SC2039
 	local latest_image_version
