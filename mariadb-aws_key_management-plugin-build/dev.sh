@@ -15,12 +15,10 @@ fi
 # set -o xtrace
 
 main() {
-	# shellcheck disable=SC2039
 	local command_help
 	command_help='docker-format - Format shell scripts and Markdown files.
 git - Run git.
 update - Check for a newer version of mariadb:latest and update this project if so.'
-	# shellcheck disable=SC2039
 	local commands
 	commands="$(main_extract_commands "$command_help")"
 	# shellcheck disable=SC2086
@@ -47,28 +45,21 @@ update() {
 	tag=latest
 	docker pull --quiet "mariadb:$tag" >/dev/null 2>&1
 
-	# shellcheck disable=SC2039
 	local current_image_version
 	current_image_version="$(cat VERSION)"
-	# shellcheck disable=SC2039
 	local ubuntu_codename
 	# https://linuxize.com/post/how-to-check-your-ubuntu-version/
 	ubuntu_codename="$(docker run --rm mariadb:$tag sh -c \
 		"grep UBUNTU_CODENAME= </etc/os-release | sed 's/UBUNTU_CODENAME=//'")"
-	# shellcheck disable=SC2039
 	local mariadb_version
 	mariadb_version="$(docker run --rm mariadb:$tag sh -c \
 		"mariadb --version | sed -E 's/^.*Distrib ([^-]+).*/\1/'")"
-	# shellcheck disable=SC2039
 	local latest_image_version
 	latest_image_version="$mariadb_version"-"$ubuntu_codename"
-	# shellcheck disable=SC2039
 	local image
 	image=creemama/mariadb-aws_key_management-plugin-build:"$latest_image_version"
-	# shellcheck disable=SC2039
 	local latest_image
 	latest_image=creemama/mariadb-aws_key_management-plugin-build:latest
-	# shellcheck disable=SC2039
 	local git_tag
 	git_tag=mariadb-aws_key_management-plugin-build-$latest_image_version
 
