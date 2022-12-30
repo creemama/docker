@@ -5,14 +5,14 @@ services:
       context: ./docker
     cap_drop:
       - ALL
-    container_name: "nginx-non-root"
+    container_name: "openresty-non-root"
     environment:
       - TZ=EST5EDT
-    image: creemama/nginx-non-root:stable-alpine
+    image: creemama/openresty-non-root:alpine
     ports:
       # HOST:CONTAINER
       - 8080:8080
-    read_only: true
+    #read_only: true
     restart: on-failure:5
     security_opt:
       - no-new-privileges

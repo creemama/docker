@@ -17,4 +17,4 @@ fi
 
 lazy-load-ocsp.sh &
 
-exec nginx -g 'daemon off;'
+exec openresty -g 'daemon off;'

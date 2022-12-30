@@ -1,10 +1,10 @@
 version: "3.7"
 services:
-  nginx-ssl-example:
+  openresty-ssl-example:
     cap_drop:
       - ALL
     command: start-server.sh
-    container_name: "nginx-ssl-example"
+    container_name: "openresty-ssl-example"
     environment:
       - TZ=EST5EDT
     healthcheck:
@@ -21,7 +21,7 @@ services:
           "https://localhost:8443",
         ]
       timeout: 30s
-    image: creemama/nginx-non-root:stable-alpine
+    image: creemama/openresty-non-root:alpine
     ports:
       # HOST:CONTAINER
       - 8080:8080
