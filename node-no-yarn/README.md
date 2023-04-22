@@ -2,7 +2,7 @@
 
 # Supported tags and respective `Dockerfile` links
 
-- [`18.13.0-alpine3.17`,`lts-alpine`](https://github.com/creemama/docker/blob/node-no-yarn-18.13.0-alpine3.17/node-no-yarn/18/alpine3.17/Dockerfile)
+- [`18.16.0-alpine3.17`,`lts-alpine`](https://github.com/creemama/docker/blob/node-no-yarn-18.16.0-alpine3.17/node-no-yarn/18/alpine3.17/Dockerfile)
 
 # A Node.js Docker image without Yarn
 
@@ -18,8 +18,8 @@ The `Dockerfile`s used to build the images are the exact same as the offical
 
 | Image                                    |  Size |
 | ---------------------------------------- | ----: |
-| creemama/node-no-yarn:18.13.0-alpine3.17 | 163MB |
-| node:18.13.0-alpine3.17                  | 171MB |
+| creemama/node-no-yarn:18.16.0-alpine3.17 | 167MB |
+| node:18.16.0-alpine3.17                  | 173MB |
 
 # Example
 
