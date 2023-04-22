@@ -51,6 +51,12 @@ update() {
 	# https://linuxize.com/post/how-to-check-your-ubuntu-version/
 	ubuntu_codename="$(docker run --rm mariadb:$tag sh -c \
 		"grep UBUNTU_CODENAME= </etc/os-release | sed 's/UBUNTU_CODENAME=//'")"
+
+	if [ "jammy" = "$ubuntu_codename" ]; then
+		printf '\n%s%sCompilation fails using ubuntu:jammy. Using ubuntu:focal instead...%s\n' "$(tbold)" "$(tred)" "$(treset)"
+		ubuntu_codename=focal
+	fi
+
 	local mariadb_version
 	mariadb_version="$(docker run --rm mariadb:$tag sh -c \
 		"mariadb --version | sed -E 's/^.*Distrib ([^-]+).*/\1/'")"
