@@ -17,6 +17,10 @@ WORKDIR /home/certbot
 # We use a 4-hour interval because we really do not need to waste energy
 # checking if this container is healthy when we only check for certificate
 # renewal twice a day.
-HEALTHCHECK --interval=4h CMD certbot -h || exit 1
+HEALTHCHECK --interval=4h CMD certbot \
+ --config-dir /home/certbot/config \
+ --work-dir /home/certbot/work \
+ --logs-dir /home/certbot/logs \
+ --version || exit 1
 ENTRYPOINT ["tini", "--"]
 CMD ["certbot-renew.py"]
