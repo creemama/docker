@@ -19,15 +19,23 @@ build_node_no_yarn() {
 	local alpine_dir
 	alpine_dir="$1"
 	# shellcheck disable=SC2039
+	local alpine_version
+	alpine_version="$2"
+	# shellcheck disable=SC2039
 	local docker_tag
-	docker_tag="$2"
+	docker_tag="$3"
 	cd "$alpine_dir"
 	printf '\n%s%sBuilding creemama/node-no-yarn:%s...%s\n\n' "$(tbold)" "$(tgreen)" "$docker_tag" "$(treset)"
-	docker build --no-cache --tag "creemama/node-no-yarn:$docker_tag" .
-	docker tag "creemama/node-no-yarn:$docker_tag" creemama/node-no-yarn:lts-alpine
+	docker pull --platform linux/amd64 alpine:"$alpine_version"
+	docker build --no-cache --platform linux/amd64 --tag "creemama/node-no-yarn:$docker_tag-amd64" .
+	docker rmi alpine:"$alpine_version"
+	docker pull --platform linux/arm64/v8 alpine:"$alpine_version"
+	docker build --no-cache --platform linux/arm64/v8 --tag "creemama/node-no-yarn:$docker_tag-arm64" .
+	docker rmi alpine:"$alpine_version"
 	cd ../..
 	printf '\n%s%sTesting creemama/node-no-yarn:%s...%s\n' "$(tbold)" "$(tgreen)" "$docker_tag" "$(treset)"
-	docker run --rm creemama/node-no-yarn:lts-alpine -e 'console.log(process.version)'
+	docker run --platform linux/amd64 --rm "creemama/node-no-yarn:$docker_tag-amd64" -e 'console.log(process.version)'
+	docker run --platform linux/arm64/v8 --rm "creemama/node-no-yarn:$docker_tag-arm64" -e 'console.log(process.version)'
 }
 
 commit_to_git() {
@@ -152,13 +160,13 @@ update() {
 	download_latest_dockerfile "$alpine_dir" "$major_version"
 	remove_yarn_from_dockerfile "$alpine_dir"
 	printf '%s' "$latest_node_lts_alpine_version" >VERSION
-	build_node_no_yarn "$alpine_dir" "$docker_tag"
+	build_node_no_yarn "$alpine_dir" "$alpine_version" "$docker_tag"
 	update_readme "$alpine_dir" "$docker_tag"
 	printf '\n%s%sFormatting the project...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	./dev.sh docker-format
 	commit_to_git "$docker_tag" "$latest_node_lts_alpine_version"
 	upload_docker_images "$docker_tag"
-	printf '\n%s%sRemember to update DockerHub README.%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
+	printf '\n%s%sRemember to update DockerHub README and delete architecture-specific images.%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 }
 
 update_readme() {
@@ -170,7 +178,7 @@ update_readme() {
 	docker_tag="$2"
 	# shellcheck disable=SC2039
 	local node_no_yarn_size
-	node_no_yarn_size=$(docker images | grep -E "^creemama/node-no-yarn\s+$docker_tag" | awk '{ print $NF }')
+	node_no_yarn_size=$(docker images | grep -E "^creemama/node-no-yarn\s+$docker_tag-amd64" | awk '{ print $NF }')
 	# shellcheck disable=SC2039
 	local node_size
 	node_size=$(docker images | grep -E '^node\s+lts-alpine' | awk '{ print $NF }')
@@ -186,8 +194,18 @@ upload_docker_images() {
 	printf '\n%s%sUploading images to Docker...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	local docker_tag
 	docker_tag="$1"
-	docker push "creemama/node-no-yarn:$docker_tag"
-	docker push creemama/node-no-yarn:lts-alpine
+	local image
+	image="creemama/node-no-yarn:$docker_tag"
+	local latest_image
+	latest_image=creemama/node-no-yarn:lts-alpine
+	docker push "$image-amd64"
+	docker push "$image-arm64"
+	docker manifest create "$image" --amend "$image-amd64" --amend "$image-arm64"
+	docker manifest create "$latest_image" --amend "$image-amd64" --amend "$image-arm64"
+	docker manifest push "$image"
+	docker manifest push "$latest_image"
+	docker rmi "$image-amd64"
+	docker rmi "$image-arm64"
 }
 
 main "$@"

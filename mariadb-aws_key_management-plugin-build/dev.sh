@@ -88,12 +88,16 @@ update() {
 	./dev.sh docker-format
 
 	printf '\n%s%sBuilding %s...%s\n\n' "$(tbold)" "$(tgreen)" "$image" "$(treset)"
-	docker pull ubuntu:"$ubuntu_codename"
 	(
 		cd docker
-		docker build --no-cache --tag "$image" .
+		docker pull --platform linux/amd64 ubuntu:"$ubuntu_codename"
+		docker build --no-cache --platform linux/amd64 --tag "$image-amd64" .
+		docker rmi ubuntu:"$ubuntu_codename"
+		docker pull --platform linux/arm64/v8 ubuntu:"$ubuntu_codename"
+		docker build --no-cache --platform linux/arm64/v8 --tag "$image-arm64" .
 	)
-	docker run --name aws_key_management_build --rm "$image"
+	docker run --name aws_key_management_build --platform linux/amd64 --rm "$image-amd64"
+	docker run --name aws_key_management_build --platform linux/arm64/v8 --rm "$image-arm64"
 
 	printf '\n%s%sCommitting to git...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	GPG_TTY=$(tty)
@@ -105,12 +109,16 @@ update() {
 	git push origin "$git_tag"
 
 	printf '\n%s%sUploading images to Docker...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
-	docker push "$image"
-	docker tag "$image" "$latest_image"
-	docker push "$latest_image"
-	docker rmi "$latest_image"
+	docker push "$image-amd64"
+	docker push "$image-arm64"
+	docker manifest create "$image" --amend "$image-amd64" --amend "$image-arm64"
+	docker manifest create "$latest_image" --amend "$image-amd64" --amend "$image-arm64"
+	docker manifest push "$image"
+	docker manifest push "$latest_image"
+	docker rmi "$image-amd64"
+	docker rmi "$image-arm64"
 
-	printf '\n%s%sRemember to update DockerHub README.%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
+	printf '\n%s%sRemember to update DockerHub README and delete architecture-specific images.%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 }
 
 main "$@"
