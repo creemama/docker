@@ -2,7 +2,7 @@
 
 # Supported tags and respective `Dockerfile` links
 
-- [`1.1.21.4.1-alpine`, `alpine`](https://github.com/creemama/docker/blob/master/openresty-non-root/docker/Dockerfile)
+- [`1.21.4.1-7-alpine`, `alpine`](https://github.com/creemama/docker/blob/master/openresty-non-root/docker/Dockerfile)
 
 # Running nginx/openresty as a non-root user
 
