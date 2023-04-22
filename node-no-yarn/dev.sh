@@ -178,7 +178,7 @@ update_readme() {
 	docker_tag="$2"
 	# shellcheck disable=SC2039
 	local node_no_yarn_size
-	node_no_yarn_size=$(docker images | grep -E "^creemama/node-no-yarn\s+$docker_tag-amd64" | awk '{ print $NF }')
+	node_no_yarn_size=$(docker images | grep -E "^creemama/node-no-yarn\s+$docker_tag-arm64" | awk '{ print $NF }')
 	# shellcheck disable=SC2039
 	local node_size
 	node_size=$(docker images | grep -E '^node\s+lts-alpine' | awk '{ print $NF }')
