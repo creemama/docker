@@ -19,8 +19,12 @@ fi
 build() {
 	local version
 	version="$(head -n 1 docker/Dockerfile | sed -E "s#.*:(.*)#\1#")"
-	docker build --tag "creemama/shellutil-dev:$version" docker
-	docker tag "creemama/shellutil-dev:$version" creemama/shellutil-dev:lts-alpine
+	docker pull --platform linux/amd64 "creemama/node-no-yarn:$version"
+	docker build --no-cache --platform linux/amd64 --tag "creemama/shellutil-dev:$version-amd64" docker
+	docker rmi "creemama/node-no-yarn:$version"
+	docker pull --platform linux/arm64/v8 "creemama/node-no-yarn:$version"
+	docker build --no-cache --platform linux/arm64/v8 --tag "creemama/shellutil-dev:$version-arm64" docker
+	docker rmi "creemama/node-no-yarn:$version"
 	docker images | grep shellutil-dev
 }
 
@@ -62,8 +66,18 @@ update - Check for a newer version of nginx:stable-alpine and update this projec
 push() {
 	local version
 	version="$(head -n 1 docker/Dockerfile | sed -E "s#.*:(.*)#\1#")"
-	docker push "creemama/shellutil-dev:$version"
-	docker push creemama/shellutil-dev:lts-alpine
+	local image
+	image="creemama/shellutil-dev:$version"
+	local latest_image
+	latest_image=creemama/shellutil-dev:lts-alpine
+	docker push "$image-amd64"
+	docker push "$image-arm64"
+	docker manifest create "$image" --amend "$image-amd64" --amend "$image-arm64"
+	docker manifest create "$latest_image" --amend "$image-amd64" --amend "$image-arm64"
+	docker manifest push "$image"
+	docker manifest push "$latest_image"
+	docker rmi "$image-amd64"
+	docker rmi "$image-arm64"
 }
 
 run_docker_update() {
