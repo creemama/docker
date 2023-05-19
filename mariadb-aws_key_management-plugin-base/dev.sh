@@ -28,7 +28,7 @@ update - Check for a newer version of mariadb:latest and update this project if 
 		(
 			# We go up one directory to give the Docker container access to shellutil.
 			cd ..
-			shellutil/format.sh docker-format mariadb-aws_key_management-plugin-build
+			shellutil/format.sh docker-shell-format mariadb-aws_key_management-plugin-base
 		)
 	elif [ "$1" = "$(arg 1 $commands)" ]; then
 		shift
@@ -43,31 +43,26 @@ update - Check for a newer version of mariadb:latest and update this project if 
 update() {
 	local tag
 	tag=latest
-	docker pull --quiet "mariadb:$tag" >/dev/null 2>&1
+	docker pull --quiet "creemama/mariadb-aws_key_management-plugin-build:$tag" >/dev/null 2>&1
 
 	local current_image_version
 	current_image_version="$(cat VERSION)"
 	local ubuntu_codename
 	# https://linuxize.com/post/how-to-check-your-ubuntu-version/
-	ubuntu_codename="$(docker run --rm mariadb:$tag sh -c \
+	ubuntu_codename="$(docker run --rm creemama/mariadb-aws_key_management-plugin-build:$tag sh -c \
 		"grep UBUNTU_CODENAME= </etc/os-release | sed 's/UBUNTU_CODENAME=//'")"
 
-	if [ "jammy" = "$ubuntu_codename" ]; then
-		printf '\n%s%sCompilation fails using ubuntu:jammy. Using ubuntu:focal instead...%s\n' "$(tbold)" "$(tred)" "$(treset)"
-		ubuntu_codename=focal
-	fi
-
 	local mariadb_version
-	mariadb_version="$(docker run --rm mariadb:$tag sh -c \
-		"mariadb --version | sed -E 's/^.*Distrib ([^-]+).*/\1/'")"
+	mariadb_version="$(docker run --rm creemama/mariadb-aws_key_management-plugin-build:$tag bash -c \
+		"cd /usr/local/src/server && source VERSION && printf '%s.%s.%s' \"\$MYSQL_VERSION_MAJOR\" \"\$MYSQL_VERSION_MINOR\" \"\$MYSQL_VERSION_PATCH\"")"
 	local latest_image_version
 	latest_image_version="$mariadb_version"-"$ubuntu_codename"
 	local image
-	image=creemama/mariadb-aws_key_management-plugin-build:"$latest_image_version"
+	image=creemama/mariadb-aws_key_management-plugin-base:"$latest_image_version"
 	local latest_image
-	latest_image=creemama/mariadb-aws_key_management-plugin-build:latest
+	latest_image=creemama/mariadb-aws_key_management-plugin-base:latest
 	local git_tag
-	git_tag=mariadb-aws_key_management-plugin-build-$latest_image_version
+	git_tag=mariadb-aws_key_management-plugin-base-$latest_image_version
 
 	if [ "$current_image_version" = "$latest_image_version" ]; then
 		printf '%s%s%s is the latest version. There is nothing to do.%s\n' "$(tbold)" "$(tgreen)" "$current_image_version" "$(treset)"
@@ -75,38 +70,45 @@ update() {
 	fi
 	printf '\n%s%sUpdating since %s != %s...%s\n' "$(tbold)" "$(tgreen)" "$current_image_version" "$latest_image_version" "$(treset)"
 
+	printf 'Would you like to update? Press enter to continue or Ctrl+C to exit...\n'
+	read -r ans
+
 	sed -E -i "" \
-		's/^FROM ubuntu:.*$/FROM ubuntu:'"$ubuntu_codename"'/;s/ [a-z]+-security/ '"$ubuntu_codename"'-security/;s/mariadb-[0-9]+\.[0-9]+\.[0-9]+/mariadb-'"$mariadb_version"'/' \
+		's/build:[0-9]+\.[0-9]+\.[0-9]+/build:'"$mariadb_version"'/' \
 		docker/Dockerfile
-	# shellcheck disable=SC2016
-	sed -E -i "" \
-		's/`[0-9]+\.[0-9]+\.[0-9]+-[^`]+`/`'"$latest_image_version"'`/' \
-		README.md
 	printf %s "$latest_image_version" >VERSION
 
 	printf '\n%s%sFormatting the project...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	./dev.sh docker-format
 
+	printf 'Would you like to build? Press enter to continue or Ctrl+C to exit...\n'
+	read -r ans
+
 	printf '\n%s%sBuilding %s...%s\n\n' "$(tbold)" "$(tgreen)" "$image" "$(treset)"
 	(
 		cd docker
-		docker pull --platform linux/amd64 ubuntu:"$ubuntu_codename"
+		docker pull --platform linux/amd64 creemama/mariadb-aws_key_management-plugin-build:"$latest_image_version"
 		docker build --no-cache --platform linux/amd64 --tag "$image-amd64" .
-		docker rmi ubuntu:"$ubuntu_codename"
-		docker pull --platform linux/arm64/v8 ubuntu:"$ubuntu_codename"
+		docker rmi creemama/mariadb-aws_key_management-plugin-build:"$latest_image_version"
+		docker pull --platform linux/arm64/v8 creemama/mariadb-aws_key_management-plugin-build:"$latest_image_version"
 		docker build --no-cache --platform linux/arm64/v8 --tag "$image-arm64" .
 	)
-	docker run --name aws_key_management_build --platform linux/amd64 --rm "$image-amd64"
-	docker run --name aws_key_management_build --platform linux/arm64/v8 --rm "$image-arm64"
+
+	printf 'Would you like to commit to Git? Press enter to continue or Ctrl+C to exit...\n'
+	read -r ans
 
 	printf '\n%s%sCommitting to git...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	GPG_TTY=$(tty)
 	export GPG_TTY
 	git add -A
-	git commit -m "Bump the version of mariadb-aws_key_management-plugin-build to $latest_image_version" -S
+	git commit -m "Bump the version of mariadb-aws_key_management-plugin-base to $latest_image_version" -S
 	git tag "$git_tag"
 	git push origin master
 	git push origin "$git_tag"
+
+	printf 'Would you like to upload to Docker Hub? Press enter to continue or Ctrl+C to exit...\n'
+	# shellcheck disable=SC2034
+	read -r ans
 
 	printf '\n%s%sUploading images to Docker...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	docker push "$image-amd64"
@@ -117,8 +119,6 @@ update() {
 	docker manifest push "$latest_image"
 	docker rmi "$image-amd64"
 	docker rmi "$image-arm64"
-
-	printf '\n%s%sRemember to update DockerHub README.%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 }
 
 main "$@"

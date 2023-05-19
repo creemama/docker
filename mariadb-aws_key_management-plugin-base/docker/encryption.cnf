@@ -1,0 +1,9 @@
+[mariadb]
+!include /etc/mysql/conf.d/enable_encryption.preset
+innodb_encrypt_log = ON
+innodb_encrypt_tables = FORCE
+innodb_encryption_threads = 4
+ssl_ca = /run/secrets/mariadb-ca
+ssl_cert = /run/secrets/mariadb-server-cert
+ssl_key = /run/secrets/mariadb-server-key
+# 2019-07-31  8:08:13 0 [ERROR] mysqld: unknown variable 'innodb_encrypt_temporary_tables=ON'
