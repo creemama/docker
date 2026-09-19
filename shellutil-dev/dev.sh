@@ -19,12 +19,12 @@ fi
 build() {
 	local version
 	version="$(head -n 1 docker/Dockerfile | sed -E "s#.*:(.*)#\1#")"
-	docker pull --platform linux/amd64 "creemama/node-no-yarn:$version"
-	docker build --no-cache --platform linux/amd64 --tag "creemama/shellutil-dev:$version-amd64" docker
-	docker rmi "creemama/node-no-yarn:$version"
-	docker pull --platform linux/arm64/v8 "creemama/node-no-yarn:$version"
-	docker build --no-cache --platform linux/arm64/v8 --tag "creemama/shellutil-dev:$version-arm64" docker
-	docker rmi "creemama/node-no-yarn:$version"
+	docker buildx build \
+		--no-cache  \
+		--platform linux/amd64,linux/arm64 \
+		--tag creemama/shellutil-dev:$version \
+		--tag creemama/shellutil-dev:lts-alpine \
+		docker
 	docker images | grep shellutil-dev
 }
 
@@ -66,31 +66,22 @@ update - Check for a newer version of nginx:stable-alpine and update this projec
 push() {
 	local version
 	version="$(head -n 1 docker/Dockerfile | sed -E "s#.*:(.*)#\1#")"
-	local image
-	image="creemama/shellutil-dev:$version"
-	local latest_image
-	latest_image=creemama/shellutil-dev:lts-alpine
-	docker push "$image-amd64"
-	docker push "$image-arm64"
-	docker manifest create "$image" --amend "$image-amd64" --amend "$image-arm64"
-	docker manifest create "$latest_image" --amend "$image-amd64" --amend "$image-arm64"
-	docker manifest push "$image"
-	docker manifest push "$latest_image"
-	docker rmi "$image-amd64"
-	docker rmi "$image-arm64"
+	docker push "creemama/shellutil-dev:$version"
+	docker push creemama/shellutil-dev:lts-alpine
 }
 
 run_docker_update() {
-	docker pull creemama/node-no-yarn:lts-alpine
+	docker pull node:lts-alpine
 	docker run -it --rm \
 		--volume "$(pwd)/..":/tmp \
 		--workdir /tmp/shellutil-dev \
-		creemama/node-no-yarn:lts-alpine \
+		node:lts-alpine \
 		sh -c './dev.sh update'
 }
 
 update() {
 	apk_update_node_image_version docker/Dockerfile
+	apk_update_package_version font-terminus docker/Dockerfile
 	apk_update_package_version git docker/Dockerfile
 	apk_update_package_version git-gitk docker/Dockerfile
 	apk_update_package_version gnupg docker/Dockerfile
@@ -98,7 +89,6 @@ update() {
 	apk_update_package_version openssh docker/Dockerfile
 	apk_update_package_version shellcheck docker/Dockerfile
 	apk_update_package_version shfmt docker/Dockerfile
-	apk_update_package_version terminus-font docker/Dockerfile
 	npm_update_package_version prettier docker/Dockerfile
 
 	# As a submodule, git status might not work in a Docker container mounted to this

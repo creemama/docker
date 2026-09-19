@@ -19,7 +19,6 @@ format() {
 	certbot-dns-route53-renew-cron/dev.sh docker-format
 	mariadb-aws_key_management-plugin-build/dev.sh docker-format
 	openresty-non-root/dev.sh docker-format
-	node-no-yarn/dev.sh docker-format
 	shellutil-dev/dev.sh docker-format
 }
 
@@ -49,7 +48,6 @@ update() {
 	set -o xtrace
 	certbot-dns-route53-renew-cron/dev.sh update
 	mariadb-aws_key_management-plugin-build/dev.sh update
-	node-no-yarn/dev.sh update
 	openresty-non-root/dev.sh update
 	shellutil-dev/dev.sh docker-update
 }
