@@ -101,31 +101,20 @@ update() {
 	read -r ans
 
 	printf '\n%s%sBuilding %s...%s\n\n' "$(tbold)" "$(tgreen)" "$image" "$(treset)"
-	(
-		cd docker
-		docker pull --platform linux/amd64 "openresty/openresty:$latest_image_version"
-		docker build --no-cache --platform linux/amd64 --tag "$image-amd64" .
-		docker rmi "openresty/openresty:$latest_image_version"
-		docker pull --platform linux/arm64/v8 "openresty/openresty:$latest_image_version"
-		docker build --no-cache --platform linux/arm64/v8 --tag "$image-arm64" .
-		docker rmi "openresty/openresty:$latest_image_version"
-	)
+	docker buildx build \
+		--no-cache \
+		--platform linux/amd64,linux/arm64 \
+		--tag "$image" \
+		--tag "$alpine_image" \
+		docker
 
 	printf '\n%s%sTry http://localhost:8080 in a browser and type Ctrl+C when done...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	docker run --name openresty-non-root-test -p 8080:8080 --rm "$image-amd64"
 	docker run --name openresty-non-root-test -p 8080:8080 --rm "$image-arm64"
 
 	printf '\n%s%sUploading images to Docker...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
-	local latest_image
-	latest_image="$alpine_image"
-	docker push "$image-amd64"
-	docker push "$image-arm64"
-	docker manifest create "$image" --amend "$image-amd64" --amend "$image-arm64"
-	docker manifest create "$latest_image" --amend "$image-amd64" --amend "$image-arm64"
-	docker manifest push "$image"
-	docker manifest push "$latest_image"
-	docker rmi "$image-amd64"
-	docker rmi "$image-arm64"
+	docker push "$image"
+	docker push "$alpine_image"
 
 	printf '\n%s%sTry https://localhost:8443 in a browser and type Ctrl+C when done...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	(
