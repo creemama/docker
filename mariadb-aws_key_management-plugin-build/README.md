@@ -1,5 +1,3 @@
-[![dockeri.co](https://dockeri.co/image/creemama/mariadb-aws_key_management-plugin-build)](https://hub.docker.com/r/creemama/mariadb-aws_key_management-plugin-build)
-
 # Supported tags and respective `Dockerfile` links
 
 - [`10.11.2-focal`, `latest`](https://github.com/creemama/docker/blob/master/mariadb-aws_key_management-plugin-build/docker/Dockerfile)

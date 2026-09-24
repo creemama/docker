@@ -1,5 +1,3 @@
-[![dockeri.co](https://dockeri.co/image/creemama/openresty-non-root)](https://hub.docker.com/r/creemama/openresty-non-root)
-
 # Supported tags and respective `Dockerfile` links
 
 - [`1.31.1.1-alpine`, `alpine`](https://github.com/creemama/docker/blob/master/openresty-non-root/docker/Dockerfile)
