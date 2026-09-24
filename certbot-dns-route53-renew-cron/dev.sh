@@ -57,7 +57,7 @@ update() {
 
 	# shellcheck disable=SC2039
 	local latest_image_version
-	latest_image_version=v"$(docker run -it --rm certbot/dns-route53:latest --version | sed 's/certbot//' | tail -n1 | tr -d '\r')"
+	latest_image_version=v"$(docker run -it --rm certbot/dns-route53:latest --version | sed 's/certbot //' | tail -n1 | tr -d '\r')"
 
 	# shellcheck disable=SC2039
 	local image
@@ -100,15 +100,16 @@ update() {
 	./dev.sh docker-format
 
 	printf '\n%s%sBuilding %s...%s\n\n' "$(tbold)" "$(tgreen)" "$image" "$(treset)"
-	(
-		cd docker
-		docker pull --platform linux/amd64 certbot/dns-route53:"$latest_image_version"
-		docker build --no-cache --platform linux/amd64 --tag "$image-amd64" .
-		docker rmi certbot/dns-route53:latest
-		docker pull --platform linux/arm64/v8 certbot/dns-route53:"$latest_image_version"
-		docker build --no-cache --platform linux/arm64/v8 --tag "$image-arm64" .
-		docker rmi certbot/dns-route53:latest
-	)
+	docker buildx build \
+		--no-cache \
+		--platform linux/amd64,linux/arm64 \
+		--tag "$image" \
+		--tag "$latest_image" \
+		docker
+
+	printf '\n%s%sUploading images to Docker...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
+	docker push "$image"
+	docker push "$latest_image"
 
 	printf '\n%s%sCommitting to git...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	GPG_TTY=$(tty)
@@ -119,17 +120,7 @@ update() {
 	git push origin master
 	git push origin "$git_tag"
 
-	printf '\n%s%sUploading images to Docker...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
-	docker push "$image-amd64"
-	docker push "$image-arm64"
-	docker manifest create "$image" --amend "$image-amd64" --amend "$image-arm64"
-	docker manifest create "$latest_image" --amend "$image-amd64" --amend "$image-arm64"
-	docker manifest push "$image"
-	docker manifest push "$latest_image"
-	docker rmi "$image-amd64"
-	docker rmi "$image-arm64"
-
-	printf '\n%s%sRemember to update DockerHub README and delete architecture-specific images.%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
+	printf '\n%s%sRemember to update DockerHub README.%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 }
 
 update_dockerfile() {
