@@ -109,8 +109,7 @@ update() {
 		docker
 
 	printf '\n%s%sTry http://localhost:8080 in a browser and type Ctrl+C when done...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
-	docker run --name openresty-non-root-test -p 8080:8080 --rm "$image-amd64"
-	docker run --name openresty-non-root-test -p 8080:8080 --rm "$image-arm64"
+	docker run --name openresty-non-root-test -p 8080:8080 --rm "$image"
 
 	printf '\n%s%sUploading images to Docker...%s\n\n' "$(tbold)" "$(tgreen)" "$(treset)"
 	docker push "$image"
