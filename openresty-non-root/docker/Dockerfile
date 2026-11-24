@@ -1,4 +1,4 @@
-FROM openresty/openresty:1.31.1.1-alpine
+FROM openresty/openresty:1.31.9.1-alpine
 
 # Organize COPY commands by destination path.
 COPY default.conf /etc/nginx/conf.d/default.conf
